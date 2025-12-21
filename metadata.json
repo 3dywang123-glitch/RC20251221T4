@@ -1,0 +1,8 @@
+{
+  "name": "恋爱顾问v0.11",
+  "description": "可访问版本",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
