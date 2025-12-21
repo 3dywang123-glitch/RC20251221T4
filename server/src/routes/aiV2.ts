@@ -4,8 +4,8 @@ import * as aiServiceV2 from '../services/aiServiceV2.js';
 
 const router = express.Router();
 
-// Smart Classification & Extraction
-router.post('/smart-classify', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+// Smart Classification & Extraction (No auth required for guest users)
+router.post('/smart-classify', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { images, model } = req.body;
     
