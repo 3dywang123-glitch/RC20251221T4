@@ -70,7 +70,7 @@ router.post('/register',
         await client.query('COMMIT');
 
         // Generate token
-        const token = jwt.sign({ userId }, process.env.JWT_SECRET!, {
+        const token = jwt.sign({ userId }, process.env.JWT_SECRET as string, {
           expiresIn: process.env.JWT_EXPIRES_IN || '7d'
         });
 
@@ -127,7 +127,7 @@ router.post('/login',
       }
 
       // Generate token
-      const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
+      const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, {
         expiresIn: process.env.JWT_EXPIRES_IN || '7d'
       });
 
@@ -166,7 +166,7 @@ router.post('/guest', async (req, res, next) => {
     );
 
     // Generate token
-    const token = jwt.sign({ userId }, process.env.JWT_SECRET!, {
+    const token = jwt.sign({ userId }, process.env.JWT_SECRET as string, {
       expiresIn: '24h'
     });
 

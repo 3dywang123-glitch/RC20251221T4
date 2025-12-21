@@ -85,7 +85,7 @@ export const callAI = async (options: AICallOptions): Promise<AIResponse> => {
 };
 
 // Robust JSON Parsing Helper (migrated from core.ts)
-export const parseJSON = (text: string) => {
+export const parseJSON = (text: string): Record<string, any> => {
   if (!text) return {};
   
   // Handle AI Refusals gracefully
