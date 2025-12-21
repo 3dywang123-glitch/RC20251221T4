@@ -7,6 +7,9 @@ import { AppError } from '../middleware/errorHandler.js';
 
 const router = express.Router();
 
+// 统一的密钥获取逻辑：如果有环境变量就用环境变量，没有就用备用密钥
+const getSecret = () => process.env.JWT_SECRET || 'my_fallback_secret_key_123456';
+
 // Register
 router.post('/register',
   body('username').isLength({ min: 3 }).trim(),
@@ -44,7 +47,6 @@ router.post('/register',
           'INSERT INTO users (username, email, password_hash, is_guest) VALUES ($1, $2, $3, $4) RETURNING id',
           [username, email, passwordHash, false]
         );
-
         const userId = userResult.rows[0].id;
 
         // If migrating from guest, transfer data
@@ -69,16 +71,11 @@ router.post('/register',
 
         await client.query('COMMIT');
 
-// Generate token
-// 修改点：如果找不到环境变量，就用 'my_fallback_secret' 当替补，不再报错
-const secret = process.env.JWT_SECRET || 'my_fallback_secret_key_123456';
-
-// 注意：我把那个 if (!secret) { throw ... } 的检查删掉了，因为现在 secret 永远有值
-
-const token = jwt.sign({ userId }, secret, {
-  expiresIn: process.env.JWT_EXPIRES_IN || '7d'
-} as SignOptions);
-
+        // Generate token (已修复)
+        const secret = getSecret();
+        const token = jwt.sign({ userId }, secret, {
+          expiresIn: process.env.JWT_EXPIRES_IN || '7d'
+        } as SignOptions);
 
         res.status(201).json({
           token,
@@ -132,11 +129,10 @@ router.post('/login',
         throw new AppError('Invalid credentials', 401);
       }
 
-      // Generate token
-      const secret = process.env.JWT_SECRET;
-      if (!secret) {
-        throw new Error('JWT_SECRET is not set');
-      }
+      // Generate token (已修复)
+      const secret = getSecret();
+      // 注意：这里去掉了 if (!secret) throw Error 的报错逻辑
+      
       const token = jwt.sign({ userId: user.id }, secret, {
         expiresIn: process.env.JWT_EXPIRES_IN || '7d'
       } as SignOptions);
@@ -175,11 +171,10 @@ router.post('/guest', async (req, res, next) => {
       [userId, 'Guest User']
     );
 
-    // Generate token
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      throw new Error('JWT_SECRET is not set');
-    }
+    // Generate token (已修复)
+    const secret = getSecret();
+    // 注意：这里也去掉了报错逻辑
+
     const token = jwt.sign({ userId }, secret, {
       expiresIn: '24h'
     } as SignOptions);

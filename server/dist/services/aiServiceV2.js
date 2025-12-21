@@ -512,7 +512,7 @@ export const compressImage = async (base64Str, maxWidth = 800, quality = 0.6) =>
     return base64Str;
 };
 // Persona Reply for Chat Simulation
-export const generatePersonaReply = async (target, messages, model = 'gemini-3-flash-preview') => {
+export const generatePersonaReply = async (target, messages, model = 'gemini-2.0-flash-exp') => {
     const prompt = `
     You are an expert method actor and behavioral psychologist.
     Roleplay as ${target.name} based on their personality and respond to the last message.
