@@ -5,8 +5,7 @@ import { authAPI, setAuthToken, clearAuthToken } from './apiClient';
 
 const KEYS = {
   USERS: 'soulsync_users_db',
-  SESSION: 'soulsync_session',
-  TOKEN: 'token' // ✅ 新增：专门用来存 Token 的 Key
+  SESSION: 'soulsync_session'
 };
 
 // --- Mock Database (LocalStorage) ---
@@ -33,7 +32,6 @@ export const loginAsGuest = async (): Promise<User> => {
     
     // Store token
     setAuthToken(result.token);
-    localStorage.setItem(KEYS.TOKEN, result.token); // ✅ 修复：强制保存 Token 到本地存储
 
     // Store user session
     const user: User = {
@@ -77,7 +75,6 @@ export const register = async (username: string, email: string, password: string
     
     // Store token
     setAuthToken(result.token);
-    localStorage.setItem(KEYS.TOKEN, result.token); // ✅ 修复：强制保存 Token 到本地存储
 
     // Store user session
     const user: User = {
@@ -150,7 +147,6 @@ export const login = async (identifier: string, password: string): Promise<User>
     
     const adminToken = 'admin-token-' + Date.now();
     setAuthToken(adminToken);
-    localStorage.setItem(KEYS.TOKEN, adminToken); // ✅ 修复：管理员登录也保存 Token
 
     return adminUser;
   }
@@ -162,7 +158,6 @@ export const login = async (identifier: string, password: string): Promise<User>
     
     // Store token
     setAuthToken(result.token);
-    localStorage.setItem(KEYS.TOKEN, result.token); // ✅ 修复：强制保存 Token 到本地存储
 
     // Store user session
     const user: User = {
@@ -198,7 +193,6 @@ export const login = async (identifier: string, password: string): Promise<User>
 export const logout = async (): Promise<void> => {
   await wait(500);
   localStorage.removeItem(KEYS.SESSION);
-  localStorage.removeItem(KEYS.TOKEN); // ✅ 修复：退出登录时顺便清除 Token
   clearAuthToken();
 };
 

@@ -205,11 +205,11 @@ export default function UserPage({ profile, userAuth, onUpdateProfile, onNavigat
 
       {/* Header */}
       <div className="flex items-center space-x-5 mt-2">
-        <div className="w-18 h-18 rounded-full bg-gray-200 overflow-hidden border-2 border-white shadow-md">
+        <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-white shadow-md">
            {profile.avatarB64 ? (
-             <img src={getAvatarSrc(profile.avatarB64)} alt="User" className="w-full h-full object-cover" width={72} height={72} />
+             <img src={getAvatarSrc(profile.avatarB64)} alt="User" className="w-full h-full object-cover" width={40} height={40} />
            ) : (
-             <div className="w-full h-full flex items-center justify-center text-2xl text-navy/30">👤</div>
+             <div className="w-full h-full flex items-center justify-center text-xl text-navy/30">👤</div>
            )}
         </div>
         <div>

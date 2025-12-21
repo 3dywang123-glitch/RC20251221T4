@@ -91,6 +91,14 @@ function AppContent() {
       Storage.setContext(session.id);
       setTargets(Storage.getTargets());
       setView('directory');
+
+      // Restore auth token for API calls
+      const token = localStorage.getItem('soulsync_auth_token') || localStorage.getItem('token');
+      if (token) {
+        import('./servicesv2/apiClient').then(({ setAuthToken }) => {
+          setAuthToken(token);
+        });
+      }
     } else {
       setView('auth');
     }
