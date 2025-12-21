@@ -319,7 +319,7 @@ const ChatPage: React.FC<Props> = ({
       </div>
 
       {/* Footer - COMPACT INPUT AREA */}
-      <div className="bg-white border-t border-gray-200 flex-shrink-0 z-20 pb-16 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.03)]">
+      <div className="bg-white border-t border-gray-200 flex-shrink-0 z-20 pb-12 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.03)]">
          
          {/* Suggested Replies Ribbon - Displays only one as requested */}
          {(localOptions.length > 0 || isGeneratingOptions) && (

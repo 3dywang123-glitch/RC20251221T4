@@ -1,5 +1,5 @@
 // API Configuration for V2
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://rc20251221t3.zeabur.internal:8080/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://bbv2.zeabur.app/api';
 
 // Get auth token from localStorage
 const getAuthToken = (): string | null => {
