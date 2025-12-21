@@ -72,7 +72,7 @@ export const callAI = async (options: AICallOptions): Promise<AIResponse> => {
       throw new Error(`AI API Error (${response.status}): ${errorText}`);
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
     
     // Extract text from OpenAI-style response
     const text = data.choices?.[0]?.message?.content || "";

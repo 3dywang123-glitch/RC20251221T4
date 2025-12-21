@@ -38,7 +38,11 @@ router.post('/register', body('username').isLength({ min: 3 }).trim(), body('ema
             await client.query('INSERT INTO user_profiles (user_id, name) VALUES ($1, $2)', [userId, username]);
             await client.query('COMMIT');
             // Generate token
-            const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+            const secret = process.env.JWT_SECRET;
+            if (!secret) {
+                throw new Error('JWT_SECRET is not set');
+            }
+            const token = jwt.sign({ userId }, secret, {
                 expiresIn: process.env.JWT_EXPIRES_IN || '7d'
             });
             res.status(201).json({
@@ -83,7 +87,11 @@ router.post('/login', body('email').isEmail().normalizeEmail(), body('password')
             throw new AppError('Invalid credentials', 401);
         }
         // Generate token
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            throw new Error('JWT_SECRET is not set');
+        }
+        const token = jwt.sign({ userId: user.id }, secret, {
             expiresIn: process.env.JWT_EXPIRES_IN || '7d'
         });
         res.json({
@@ -110,7 +118,11 @@ router.post('/guest', async (req, res, next) => {
         // Create default profile
         await pool.query('INSERT INTO user_profiles (user_id, name) VALUES ($1, $2)', [userId, 'Guest User']);
         // Generate token
-        const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            throw new Error('JWT_SECRET is not set');
+        }
+        const token = jwt.sign({ userId }, secret, {
             expiresIn: '24h'
         });
         res.json({

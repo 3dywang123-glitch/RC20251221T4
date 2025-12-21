@@ -1,6 +1,6 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
 import pool from '../db/connection.js';
 import { AppError } from '../middleware/errorHandler.js';
@@ -70,9 +70,13 @@ router.post('/register',
         await client.query('COMMIT');
 
         // Generate token
-        const token = jwt.sign({ userId }, process.env.JWT_SECRET as string, {
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+          throw new Error('JWT_SECRET is not set');
+        }
+        const token = jwt.sign({ userId }, secret, {
           expiresIn: process.env.JWT_EXPIRES_IN || '7d'
-        });
+        } as SignOptions);
 
         res.status(201).json({
           token,
@@ -127,9 +131,13 @@ router.post('/login',
       }
 
       // Generate token
-      const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, {
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        throw new Error('JWT_SECRET is not set');
+      }
+      const token = jwt.sign({ userId: user.id }, secret, {
         expiresIn: process.env.JWT_EXPIRES_IN || '7d'
-      });
+      } as SignOptions);
 
       res.json({
         token,
@@ -166,9 +174,13 @@ router.post('/guest', async (req, res, next) => {
     );
 
     // Generate token
-    const token = jwt.sign({ userId }, process.env.JWT_SECRET as string, {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error('JWT_SECRET is not set');
+    }
+    const token = jwt.sign({ userId }, secret, {
       expiresIn: '24h'
-    });
+    } as SignOptions);
 
     res.json({
       token,
