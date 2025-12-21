@@ -1,4 +1,3 @@
-
 import { User, SubscriptionTier } from '../types';
 import { wait } from './ai/core';
 import * as Storage from './storageService';
@@ -6,7 +5,8 @@ import { authAPI, setAuthToken, clearAuthToken } from './apiClient';
 
 const KEYS = {
   USERS: 'soulsync_users_db',
-  SESSION: 'soulsync_session'
+  SESSION: 'soulsync_session',
+  TOKEN: 'token' // ✅ 新增：专门用来存 Token 的 Key
 };
 
 // --- Mock Database (LocalStorage) ---
@@ -30,9 +30,10 @@ export const loginAsGuest = async (): Promise<User> => {
   try {
     // Call server API
     const result = await authAPI.guestLogin();
-
+    
     // Store token
     setAuthToken(result.token);
+    localStorage.setItem(KEYS.TOKEN, result.token); // ✅ 修复：强制保存 Token 到本地存储
 
     // Store user session
     const user: User = {
@@ -45,15 +46,14 @@ export const loginAsGuest = async (): Promise<User> => {
       joinedAt: Date.now(),
       avatarB64: undefined
     };
-    localStorage.setItem(KEYS.SESSION, JSON.stringify(user));
 
+    localStorage.setItem(KEYS.SESSION, JSON.stringify(user));
     return user;
   } catch (error: any) {
     // Fallback to local mock if server fails
     console.warn('Server guest login failed, falling back to local mock:', error.message);
-
+    
     const guestId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-
     const guestUser: User = {
       id: guestId,
       name: 'Visitor',
@@ -74,9 +74,10 @@ export const register = async (username: string, email: string, password: string
   try {
     // Call server API
     const result = await authAPI.register(username, email, password, migrateFromGuestId);
-
+    
     // Store token
     setAuthToken(result.token);
+    localStorage.setItem(KEYS.TOKEN, result.token); // ✅ 修复：强制保存 Token 到本地存储
 
     // Store user session
     const user: User = {
@@ -89,19 +90,17 @@ export const register = async (username: string, email: string, password: string
       joinedAt: Date.now(),
       avatarB64: undefined
     };
-    localStorage.setItem(KEYS.SESSION, JSON.stringify(user));
 
+    localStorage.setItem(KEYS.SESSION, JSON.stringify(user));
     return user;
   } catch (error: any) {
     // Fallback to local mock if server fails
     console.warn('Server register failed, falling back to local mock:', error.message);
-
+    
     const db = getDB();
-
     if (db.find(u => u.email === email)) {
       throw new Error("Email already registered");
     }
-
     if (db.find(u => u.name === username)) {
       throw new Error("Username already taken");
     }
@@ -130,7 +129,6 @@ export const register = async (username: string, email: string, password: string
     // Auto-login after register
     const { passwordHash, ...safeUser } = newUser;
     localStorage.setItem(KEYS.SESSION, JSON.stringify(safeUser));
-
     return safeUser;
   }
 };
@@ -147,9 +145,13 @@ export const login = async (identifier: string, password: string): Promise<User>
       joinedAt: Date.now(),
       avatarB64: undefined
     };
+    
     localStorage.setItem(KEYS.SESSION, JSON.stringify(adminUser));
-    // For admin, we don't have a real token, but we'll set a dummy one to avoid 401
-    setAuthToken('admin-token-' + Date.now());
+    
+    const adminToken = 'admin-token-' + Date.now();
+    setAuthToken(adminToken);
+    localStorage.setItem(KEYS.TOKEN, adminToken); // ✅ 修复：管理员登录也保存 Token
+
     return adminUser;
   }
   // ---------------------------
@@ -157,9 +159,10 @@ export const login = async (identifier: string, password: string): Promise<User>
   try {
     // Call server API
     const result = await authAPI.login(identifier, password);
-
+    
     // Store token
     setAuthToken(result.token);
+    localStorage.setItem(KEYS.TOKEN, result.token); // ✅ 修复：强制保存 Token 到本地存储
 
     // Store user session
     const user: User = {
@@ -172,23 +175,22 @@ export const login = async (identifier: string, password: string): Promise<User>
       joinedAt: Date.now(),
       avatarB64: undefined
     };
-    localStorage.setItem(KEYS.SESSION, JSON.stringify(user));
 
+    localStorage.setItem(KEYS.SESSION, JSON.stringify(user));
     return user;
   } catch (error: any) {
     // Fallback to local mock if server fails
     console.warn('Server login failed, falling back to local mock:', error.message);
-
+    
     const db = getDB();
     const user = db.find(u => (u.email === identifier || u.name === identifier) && u.passwordHash === password);
-
+    
     if (!user) {
       throw new Error("Invalid credentials");
     }
 
     const { passwordHash, ...safeUser } = user;
     localStorage.setItem(KEYS.SESSION, JSON.stringify(safeUser));
-
     return safeUser;
   }
 };
@@ -196,6 +198,7 @@ export const login = async (identifier: string, password: string): Promise<User>
 export const logout = async (): Promise<void> => {
   await wait(500);
   localStorage.removeItem(KEYS.SESSION);
+  localStorage.removeItem(KEYS.TOKEN); // ✅ 修复：退出登录时顺便清除 Token
   clearAuthToken();
 };
 
@@ -221,13 +224,12 @@ export const updateUser = async (updates: Partial<User>): Promise<User> => {
   const index = db.findIndex(u => u.id === session.id);
   
   if (index === -1) throw new Error("User record not found");
-
+  
   const updatedUserDB = { ...db[index], ...updates };
   db[index] = updatedUserDB;
   saveDB(db);
-
+  
   const { passwordHash, ...safeUser } = updatedUserDB;
   localStorage.setItem(KEYS.SESSION, JSON.stringify(safeUser));
-
   return safeUser;
 };
