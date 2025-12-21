@@ -179,14 +179,16 @@ export interface TargetProfile {
   avatarB64?: string;
   additionalImages?: string[]; // Array of reference photos
   avatarAnalysis?: string; // The "Vibe Check" result
-  
+
+  isSample?: boolean; // Flag for sample profiles
+
   personalityReport?: PersonalityReport;
   generalSummary?: string; // Derived from personality report
-  
+
   socialMediaData: SocialMediaData[];
   socialAnalysisHistory?: SocialAnalysisResult[];
   postAnalysisHistory?: SocialPostAnalysis[];
-  
+
   consultationHistory: RelationshipReport[];
 }
 

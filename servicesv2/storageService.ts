@@ -147,7 +147,7 @@ export const getTargets = (): TargetProfile[] => {
   if (!CURRENT_USER_ID) return [];
   const keys = getKeys(CURRENT_USER_ID);
   const stored = localStorage.getItem(keys.TARGETS);
-  
+
   // Inject samples if empty
   if (!stored || JSON.parse(stored).length === 0) {
      return [SAMPLE_TARGET, SAMPLE_TARGET_2];
@@ -156,25 +156,34 @@ export const getTargets = (): TargetProfile[] => {
   let targets = JSON.parse(stored);
   let hasChanges = false;
 
+  // Ensure samples are always present and up to date
+  const samples = [SAMPLE_TARGET, SAMPLE_TARGET_2];
+  const existingSampleIds = targets.filter((t: TargetProfile) => t.isSample).map((t: TargetProfile) => t.id);
+  const missingSamples = samples.filter(sample => !existingSampleIds.includes(sample.id));
+
+  // Add missing samples
+  if (missingSamples.length > 0) {
+    targets = [...targets, ...missingSamples];
+    hasChanges = true;
+  }
+
   // Auto-repair samples: Ensure avatar URLs are up to date with code constants
   // This fixes the issue where old broken avatars persist in LocalStorage
-  const samples = [SAMPLE_TARGET, SAMPLE_TARGET_2];
-  
   samples.forEach(sample => {
     const index = targets.findIndex((t: TargetProfile) => t.id === sample.id);
     if (index !== -1) {
        // Check for ANY mismatch in key visual properties and force update
-       if (targets[index].avatarB64 !== sample.avatarB64 || 
+       if (targets[index].avatarB64 !== sample.avatarB64 ||
            targets[index].name !== sample.name ||
            targets[index].bio !== sample.bio) {
-          
+
           // Merge the stored history/chats with the fresh Sample definition
           targets[index] = {
               ...targets[index], // Keep user-generated history if any
               ...sample,         // Overwrite static fields (avatar, name, bio, core reports)
               // Specific overwrites to ensure visual assets are fixed
               avatarB64: sample.avatarB64,
-              personalityReport: sample.personalityReport 
+              personalityReport: sample.personalityReport
           };
           hasChanges = true;
        }

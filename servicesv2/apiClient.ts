@@ -1,5 +1,5 @@
 // API Configuration for V2
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://rc20251221t3.zeabur.internal:8080/api';
 
 // Get auth token from localStorage
 const getAuthToken = (): string | null => {
@@ -20,9 +20,9 @@ export const clearAuthToken = () => {
 const apiRequest = async (endpoint: string, options: RequestInit = {}, retries = 2) => {
   const token = getAuthToken();
   
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...options.headers,
+    ...(options.headers as Record<string, string>),
   };
 
   if (token) {
