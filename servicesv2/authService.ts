@@ -2,6 +2,7 @@
 import { User, SubscriptionTier } from '../types';
 import { wait } from './ai/core';
 import * as Storage from './storageService';
+import { authAPI, setAuthToken, clearAuthToken } from './apiClient';
 
 const KEYS = {
   USERS: 'soulsync_users_db',
@@ -26,71 +27,115 @@ const saveDB = (users: DBUser[]) => {
 // --- Service Methods ---
 
 export const loginAsGuest = async (): Promise<User> => {
-  await wait(800);
-  
-  const guestId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-  
-  const guestUser: User = {
-    id: guestId,
-    name: 'Visitor',
-    email: 'guest@soulsync.app',
-    subscriptionTier: SubscriptionTier.FREE,
-    isVip: false,
-    isGuest: true,
-    joinedAt: Date.now(),
-    avatarB64: undefined
-  };
+  try {
+    // Call server API
+    const result = await authAPI.guestLogin();
 
-  // We don't necessarily need to add guests to the main "Users DB" unless we want to track them.
-  // But for session management, we treat them as logged in.
-  localStorage.setItem(KEYS.SESSION, JSON.stringify(guestUser));
-  return guestUser;
+    // Store token
+    setAuthToken(result.token);
+
+    // Store user session
+    const user: User = {
+      id: result.user.id,
+      name: 'Visitor',
+      email: result.user.email,
+      subscriptionTier: SubscriptionTier.FREE,
+      isVip: false,
+      isGuest: result.user.isGuest,
+      joinedAt: Date.now(),
+      avatarB64: undefined
+    };
+    localStorage.setItem(KEYS.SESSION, JSON.stringify(user));
+
+    return user;
+  } catch (error: any) {
+    // Fallback to local mock if server fails
+    console.warn('Server guest login failed, falling back to local mock:', error.message);
+
+    const guestId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+
+    const guestUser: User = {
+      id: guestId,
+      name: 'Visitor',
+      email: 'guest@soulsync.app',
+      subscriptionTier: SubscriptionTier.FREE,
+      isVip: false,
+      isGuest: true,
+      joinedAt: Date.now(),
+      avatarB64: undefined
+    };
+
+    localStorage.setItem(KEYS.SESSION, JSON.stringify(guestUser));
+    return guestUser;
+  }
 };
 
 export const register = async (username: string, email: string, password: string, migrateFromGuestId?: string): Promise<User> => {
-  await wait(1500); // Simulate API network latency
-  
-  const db = getDB();
-  
-  if (db.find(u => u.email === email)) {
-    throw new Error("Email already registered");
+  try {
+    // Call server API
+    const result = await authAPI.register(username, email, password, migrateFromGuestId);
+
+    // Store token
+    setAuthToken(result.token);
+
+    // Store user session
+    const user: User = {
+      id: result.user.id,
+      name: result.user.username,
+      email: result.user.email,
+      subscriptionTier: SubscriptionTier.FREE,
+      isVip: false,
+      isGuest: result.user.isGuest,
+      joinedAt: Date.now(),
+      avatarB64: undefined
+    };
+    localStorage.setItem(KEYS.SESSION, JSON.stringify(user));
+
+    return user;
+  } catch (error: any) {
+    // Fallback to local mock if server fails
+    console.warn('Server register failed, falling back to local mock:', error.message);
+
+    const db = getDB();
+
+    if (db.find(u => u.email === email)) {
+      throw new Error("Email already registered");
+    }
+
+    if (db.find(u => u.name === username)) {
+      throw new Error("Username already taken");
+    }
+
+    const newId = `user_${Date.now()}`;
+    const newUser: DBUser = {
+      id: newId,
+      name: username,
+      email,
+      passwordHash: password,
+      subscriptionTier: SubscriptionTier.FREE,
+      isVip: false,
+      isGuest: false,
+      joinedAt: Date.now(),
+      avatarB64: undefined
+    };
+
+    db.push(newUser);
+    saveDB(db);
+
+    // If registering from a guest session, migrate data
+    if (migrateFromGuestId) {
+      Storage.migrateUserData(migrateFromGuestId, newId);
+    }
+
+    // Auto-login after register
+    const { passwordHash, ...safeUser } = newUser;
+    localStorage.setItem(KEYS.SESSION, JSON.stringify(safeUser));
+
+    return safeUser;
   }
-
-  if (db.find(u => u.name === username)) {
-    throw new Error("Username already taken");
-  }
-
-  const newId = `user_${Date.now()}`;
-  const newUser: DBUser = {
-    id: newId,
-    name: username,
-    email,
-    passwordHash: password,
-    subscriptionTier: SubscriptionTier.FREE,
-    isVip: false,
-    isGuest: false,
-    joinedAt: Date.now(),
-    avatarB64: undefined
-  };
-
-  db.push(newUser);
-  saveDB(db);
-
-  // If registering from a guest session, migrate data
-  if (migrateFromGuestId) {
-    Storage.migrateUserData(migrateFromGuestId, newId);
-  }
-
-  // Auto-login after register
-  const { passwordHash, ...safeUser } = newUser;
-  localStorage.setItem(KEYS.SESSION, JSON.stringify(safeUser));
-  
-  return safeUser;
 };
 
 export const login = async (identifier: string, password: string): Promise<User> => {
-  await wait(1500); // Simulate API network latency
-
   // --- ROOT ADMIN BACKDOOR ---
   if (identifier === '1234' && password === '1234') {
     const adminUser: User = {
@@ -100,29 +145,58 @@ export const login = async (identifier: string, password: string): Promise<User>
       subscriptionTier: SubscriptionTier.LIFETIME,
       isVip: true,
       joinedAt: Date.now(),
-      avatarB64: undefined 
+      avatarB64: undefined
     };
     localStorage.setItem(KEYS.SESSION, JSON.stringify(adminUser));
+    // For admin, we don't have a real token, but we'll set a dummy one to avoid 401
+    setAuthToken('admin-token-' + Date.now());
     return adminUser;
   }
   // ---------------------------
 
-  const db = getDB();
-  const user = db.find(u => (u.email === identifier || u.name === identifier) && u.passwordHash === password);
+  try {
+    // Call server API
+    const result = await authAPI.login(identifier, password);
 
-  if (!user) {
-    throw new Error("Invalid credentials");
+    // Store token
+    setAuthToken(result.token);
+
+    // Store user session
+    const user: User = {
+      id: result.user.id,
+      name: result.user.username,
+      email: result.user.email,
+      subscriptionTier: SubscriptionTier.FREE,
+      isVip: false,
+      isGuest: result.user.isGuest,
+      joinedAt: Date.now(),
+      avatarB64: undefined
+    };
+    localStorage.setItem(KEYS.SESSION, JSON.stringify(user));
+
+    return user;
+  } catch (error: any) {
+    // Fallback to local mock if server fails
+    console.warn('Server login failed, falling back to local mock:', error.message);
+
+    const db = getDB();
+    const user = db.find(u => (u.email === identifier || u.name === identifier) && u.passwordHash === password);
+
+    if (!user) {
+      throw new Error("Invalid credentials");
+    }
+
+    const { passwordHash, ...safeUser } = user;
+    localStorage.setItem(KEYS.SESSION, JSON.stringify(safeUser));
+
+    return safeUser;
   }
-
-  const { passwordHash, ...safeUser } = user;
-  localStorage.setItem(KEYS.SESSION, JSON.stringify(safeUser));
-  
-  return safeUser;
 };
 
 export const logout = async (): Promise<void> => {
   await wait(500);
   localStorage.removeItem(KEYS.SESSION);
+  clearAuthToken();
 };
 
 export const getSession = (): User | null => {

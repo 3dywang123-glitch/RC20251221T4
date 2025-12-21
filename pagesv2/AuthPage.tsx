@@ -126,7 +126,7 @@ const AuthPage: React.FC<Props> = ({ onAuthSuccess }) => {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full p-4 md:p-3 bg-[#F5F2EA] rounded-2xl border border-transparent outline-none focus:bg-white focus:border-gold/30 transition text-black font-bold text-sm placeholder-gray-400"
+                    className="w-full p-4 md:p-3 bg-[#F5F2EA] rounded-2xl border border-transparent outline-none focus:bg-white focus:border-gold/30 transition text-navy font-bold text-sm placeholder-gray-400"
                     placeholder={t('auth.chooseUsername')}
                   />
                 </div>
@@ -140,7 +140,7 @@ const AuthPage: React.FC<Props> = ({ onAuthSuccess }) => {
                   type="text"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  className="w-full p-4 md:p-3 bg-[#F5F2EA] rounded-2xl border border-transparent outline-none focus:bg-white focus:border-gold/30 transition text-black font-bold text-sm placeholder-gray-400"
+                  className="w-full p-4 md:p-3 bg-[#F5F2EA] rounded-2xl border border-transparent outline-none focus:bg-white focus:border-gold/30 transition text-navy font-bold text-sm placeholder-gray-400"
                   placeholder={mode === 'signin' ? t('auth.enterId') : "hello@example.com"}
                   required
                 />
@@ -153,7 +153,7 @@ const AuthPage: React.FC<Props> = ({ onAuthSuccess }) => {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-4 md:p-3 bg-[#F5F2EA] rounded-2xl border border-transparent outline-none focus:bg-white focus:border-gold/30 transition text-black font-bold text-sm pr-12 placeholder-gray-400"
+                    className="w-full p-4 md:p-3 bg-[#F5F2EA] rounded-2xl border border-transparent outline-none focus:bg-white focus:border-gold/30 transition text-navy font-bold text-sm pr-12 placeholder-gray-400"
                     placeholder="••••••••"
                     required
                   />
