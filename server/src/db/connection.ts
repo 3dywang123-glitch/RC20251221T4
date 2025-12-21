@@ -6,7 +6,8 @@ dotenv.config();
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: false, // Disable SSL for now
+  connectionTimeoutMillis: 10000, // 10 seconds
 });
 
 pool.on('connect', () => {
