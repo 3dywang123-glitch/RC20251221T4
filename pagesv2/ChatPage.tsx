@@ -235,7 +235,7 @@ const ChatPage: React.FC<Props> = ({
       </div>
 
       {/* 3. Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-cream scroll-smooth pb-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-cream scroll-smooth">
         
         {/* Chat Tips */}
         <div className="flex justify-center mb-4 animate-fade-in relative z-0 cursor-pointer active:scale-95 transition-transform" onClick={handleTipClick}>
@@ -319,7 +319,7 @@ const ChatPage: React.FC<Props> = ({
       </div>
 
       {/* Footer - COMPACT INPUT AREA */}
-      <div className="bg-white border-t border-gray-200 flex-shrink-0 z-20 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.03)]">
+      <div className="bg-white border-t border-gray-200 flex-shrink-0 z-20 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.03)] sticky bottom-0">
          
          {/* Suggested Replies Ribbon - Displays only one as requested */}
          {(localOptions.length > 0 || isGeneratingOptions) && (

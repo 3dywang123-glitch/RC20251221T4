@@ -265,14 +265,14 @@ export default function UserPage({ profile, userAuth, onUpdateProfile, onNavigat
                      value={regUsername}
                      onChange={(e) => setRegUsername(e.target.value)}
                      placeholder={t('auth.username')}
-                     className="w-full p-3 bg-gray-50 rounded-xl text-sm border border-transparent focus:bg-white focus:border-navy/20 outline-none"
+                     className="w-full p-3 bg-gray-50 rounded-xl text-sm border border-transparent focus:bg-white focus:border-navy/20 outline-none text-navy font-medium"
                      required
                    />
                    <input 
                      value={regEmail}
                      onChange={(e) => setRegEmail(e.target.value)}
                      placeholder={t('auth.email')}
-                     className="w-full p-3 bg-gray-50 rounded-xl text-sm border border-transparent focus:bg-white focus:border-navy/20 outline-none"
+                     className="w-full p-3 bg-gray-50 rounded-xl text-sm border border-transparent focus:bg-white focus:border-navy/20 outline-none text-navy font-medium"
                      required
                    />
                    <div className="relative">
@@ -281,7 +281,7 @@ export default function UserPage({ profile, userAuth, onUpdateProfile, onNavigat
                         value={regPassword}
                         onChange={(e) => setRegPassword(e.target.value)}
                         placeholder={t('auth.password')}
-                        className="w-full p-3 bg-gray-50 rounded-xl text-sm border border-transparent focus:bg-white focus:border-navy/20 outline-none"
+                        className="w-full p-3 bg-gray-50 rounded-xl text-sm border border-transparent focus:bg-white focus:border-navy/20 outline-none text-navy font-medium"
                         required
                       />
                       <button 
@@ -443,7 +443,7 @@ export default function UserPage({ profile, userAuth, onUpdateProfile, onNavigat
       </div>
 
       <div className="text-center text-[10px] text-navy/30 pt-8 font-bold uppercase tracking-widest">
-         Relationship Consultant v1.4.1
+         betav202512212325
       </div>
     </div>
   );
