@@ -290,7 +290,7 @@ const ProfilePage: React.FC<Props> = ({
             <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
                <div className="w-14 h-14 rounded-full bg-gray-200 overflow-hidden border-2 border-white shadow-md flex-shrink-0">
                   {target.avatarB64 ? (
-                     <img src={getAvatarSrc(target.avatarB64)} className="w-full h-full object-cover" alt="avatar" />
+                     <img src={getAvatarSrc(target.avatarB64)} className="w-full h-full object-cover" alt="avatar" width={56} height={56} />
                   ) : (
                      <div className="w-full h-full flex items-center justify-center text-xl text-navy/30">?</div>
                   )}
@@ -480,7 +480,7 @@ const ProfilePage: React.FC<Props> = ({
                   <label className="relative w-24 h-24 flex-shrink-0 cursor-pointer group">
                      <div className="w-24 h-24 rounded-full bg-gray-50 overflow-hidden border-2 border-white shadow-lg group-hover:border-gold/30 transition-all">
                         {editForm.avatarB64 ? (
-                           <img src={getAvatarSrc(editForm.avatarB64)} className="w-full h-full object-cover" alt="avatar" />
+                           <img src={getAvatarSrc(editForm.avatarB64)} className="w-full h-full object-cover" alt="avatar" width={96} height={96} />
                         ) : (
                            <div className="w-full h-full flex items-center justify-center text-3xl text-navy/20 bg-gray-100">?</div>
                         )}
@@ -603,7 +603,7 @@ const ProfilePage: React.FC<Props> = ({
               <div className="relative">
                  <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden border-2 border-white shadow-md">
                     {target.avatarB64 ? (
-                       <img src={getAvatarSrc(target.avatarB64)} className="w-full h-full object-cover" alt="avatar" />
+                       <img src={getAvatarSrc(target.avatarB64)} className="w-full h-full object-cover" alt="avatar" width={64} height={64} />
                     ) : (
                        <div className="w-full h-full flex items-center justify-center text-xl text-navy/30">?</div>
                     )}

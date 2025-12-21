@@ -45,7 +45,7 @@ const ProfileRecordsPage: React.FC<Props> = ({ target, onBack }) => {
               
               <div className="flex items-start gap-4">
                  <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden border-2 border-white shadow-md flex-shrink-0">
-                    <img src={getAvatarSrc(target.avatarB64)} className="w-full h-full object-cover" alt="avatar" />
+                    <img src={getAvatarSrc(target.avatarB64)} className="w-full h-full object-cover" alt="avatar" width={64} height={64} />
                  </div>
                  <div className="space-y-1">
                     <div className="text-lg font-serif font-bold text-navy">{target.name}</div>

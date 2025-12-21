@@ -141,6 +141,20 @@ export const migrateUserData = (oldUserId: string, newUserId: string) => {
   }
 };
 
+// --- Visitor ID Management ---
+
+export const getVisitorId = (): string => {
+  const VISITOR_ID_KEY = 'soulsync_visitor_id';
+  let visitorId = localStorage.getItem(VISITOR_ID_KEY);
+  if (!visitorId) {
+    // Generate a random 5-digit number
+    const randomNum = Math.floor(10000 + Math.random() * 90000);
+    visitorId = `游客${randomNum}`;
+    localStorage.setItem(VISITOR_ID_KEY, visitorId);
+  }
+  return visitorId;
+};
+
 // --- CRUD Operations ---
 
 export const getTargets = (): TargetProfile[] => {

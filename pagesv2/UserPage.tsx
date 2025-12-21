@@ -6,6 +6,7 @@ import { getAvatarSrc } from '../utils';
 import { compressImage } from '../servicesv2/ai/core';
 import * as AuthService from '../servicesv2/authService';
 import * as Storage from '../servicesv2/storageService';
+import { getVisitorId } from '../servicesv2/storageService';
 import { useTranslation } from '../contextsv2/LanguageContext';
 
 interface Props {
@@ -119,7 +120,7 @@ export default function UserPage({ profile, userAuth, onUpdateProfile, onNavigat
                   <label className="relative w-24 h-24 flex-shrink-0 cursor-pointer group">
                      <div className="w-24 h-24 rounded-full bg-gray-50 overflow-hidden border-2 border-white shadow-lg group-hover:border-gold/30 transition-all">
                         {editForm.avatarB64 ? (
-                           <img src={getAvatarSrc(editForm.avatarB64)} className="w-full h-full object-cover" alt="avatar" />
+                           <img src={getAvatarSrc(editForm.avatarB64)} className="w-full h-full object-cover" alt="avatar" width={96} height={96} />
                         ) : (
                            <div className="w-full h-full flex items-center justify-center text-3xl text-navy/20 bg-gray-100">?</div>
                         )}
@@ -206,7 +207,7 @@ export default function UserPage({ profile, userAuth, onUpdateProfile, onNavigat
       <div className="flex items-center space-x-5 mt-2">
         <div className="w-18 h-18 rounded-full bg-gray-200 overflow-hidden border-2 border-white shadow-md">
            {profile.avatarB64 ? (
-             <img src={getAvatarSrc(profile.avatarB64)} alt="User" className="w-full h-full object-cover" />
+             <img src={getAvatarSrc(profile.avatarB64)} alt="User" className="w-full h-full object-cover" width={72} height={72} />
            ) : (
              <div className="w-full h-full flex items-center justify-center text-2xl text-navy/30">👤</div>
            )}
@@ -216,9 +217,14 @@ export default function UserPage({ profile, userAuth, onUpdateProfile, onNavigat
              {t('user.hello', { name: profile.name || userAuth.name || 'User' })}
            </h2>
            {userAuth.isGuest ? (
-             <span className="mt-1 inline-block text-[10px] bg-gray-200 text-gray-500 font-bold px-2 py-0.5 rounded border border-gray-300 uppercase tracking-wide">
-               {t('user.guest')}
-             </span>
+             <div className="mt-1 space-y-1">
+               <span className="inline-block text-[10px] bg-gray-200 text-gray-500 font-bold px-2 py-0.5 rounded border border-gray-300 uppercase tracking-wide">
+                 {t('user.guest')}
+               </span>
+               <div className="text-[9px] text-navy/50 font-mono">
+                 ID: {getVisitorId()}
+               </div>
+             </div>
            ) : (
              <button onClick={() => onNavigate && onNavigate('payment')} className="mt-1 text-[10px] text-red-500 font-bold bg-red-50 px-2.5 py-1 rounded border border-red-100 flex items-center gap-1.5 animate-pulse uppercase tracking-wide">
                 <ZapIcon className="w-3 h-3" /> {t('user.planExpiring')}

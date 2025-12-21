@@ -69,7 +69,7 @@ const AuthPage: React.FC<Props> = ({ onAuthSuccess }) => {
       <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-gold opacity-5 rounded-full blur-[120px] animate-pulse"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-navy opacity-5 rounded-full blur-[100px]"></div>
 
-      <div className="w-full max-w-md relative z-10 flex flex-col items-center">
+      <div className="w-full max-w-md md:max-w-sm relative z-10 flex flex-col items-center">
         
         {/* Brand Header */}
         <div className="text-center mb-8 animate-fade-in">
@@ -83,7 +83,7 @@ const AuthPage: React.FC<Props> = ({ onAuthSuccess }) => {
              </div>
           </div>
           
-          <h1 className="text-4xl font-serif font-bold text-navy tracking-tight mb-2">{t('app.name')}<span className="text-gold">{t('app.suffix')}</span></h1>
+          <h1 className="text-4xl md:text-3xl font-serif font-bold text-navy tracking-tight mb-2">{t('app.name')}<span className="text-gold">{t('app.suffix')}</span></h1>
           <p className="text-navy/40 text-xs font-bold uppercase tracking-[0.3em]">{t('app.tagline')}</p>
         </div>
 
@@ -108,7 +108,7 @@ const AuthPage: React.FC<Props> = ({ onAuthSuccess }) => {
 
           <div className="p-8 pt-6">
             <div className="mb-6 text-center sm:text-left">
-               <h2 className="text-2xl font-serif font-bold text-navy">
+               <h2 className="text-2xl md:text-xl font-serif font-bold text-navy">
                  {mode === 'signin' ? t('auth.welcomeBack') : t('auth.getStarted')}
                </h2>
                <p className="text-gray-400 text-xs mt-1 font-medium leading-relaxed">
@@ -122,11 +122,11 @@ const AuthPage: React.FC<Props> = ({ onAuthSuccess }) => {
               {mode === 'signup' && (
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-gold-dark uppercase tracking-widest pl-2">{t('auth.username')}</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full p-4 bg-[#F5F2EA] rounded-2xl border border-transparent outline-none focus:bg-white focus:border-gold/30 transition text-navy font-bold text-sm placeholder-gray-400"
+                    className="w-full p-4 md:p-3 bg-[#F5F2EA] rounded-2xl border border-transparent outline-none focus:bg-white focus:border-gold/30 transition text-black font-bold text-sm placeholder-gray-400"
                     placeholder={t('auth.chooseUsername')}
                   />
                 </div>
@@ -136,11 +136,11 @@ const AuthPage: React.FC<Props> = ({ onAuthSuccess }) => {
                 <label className="text-[10px] font-bold text-gold-dark uppercase tracking-widest pl-2">
                   {mode === 'signin' ? t('auth.emailUser') : t('auth.email')}
                 </label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  className="w-full p-4 bg-[#F5F2EA] rounded-2xl border border-transparent outline-none focus:bg-white focus:border-gold/30 transition text-navy font-bold text-sm placeholder-gray-400"
+                  className="w-full p-4 md:p-3 bg-[#F5F2EA] rounded-2xl border border-transparent outline-none focus:bg-white focus:border-gold/30 transition text-black font-bold text-sm placeholder-gray-400"
                   placeholder={mode === 'signin' ? t('auth.enterId') : "hello@example.com"}
                   required
                 />
@@ -149,11 +149,11 @@ const AuthPage: React.FC<Props> = ({ onAuthSuccess }) => {
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-gold-dark uppercase tracking-widest pl-2">{t('auth.password')}</label>
                 <div className="relative">
-                  <input 
-                    type={showPassword ? "text" : "password"} 
+                  <input
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-4 bg-[#F5F2EA] rounded-2xl border border-transparent outline-none focus:bg-white focus:border-gold/30 transition text-navy font-bold text-sm pr-12 placeholder-gray-400"
+                    className="w-full p-4 md:p-3 bg-[#F5F2EA] rounded-2xl border border-transparent outline-none focus:bg-white focus:border-gold/30 transition text-black font-bold text-sm pr-12 placeholder-gray-400"
                     placeholder="••••••••"
                     required
                   />
@@ -177,7 +177,7 @@ const AuthPage: React.FC<Props> = ({ onAuthSuccess }) => {
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full py-4 bg-navy text-white rounded-2xl font-bold shadow-lg shadow-navy/20 active:scale-[0.98] transition hover:bg-navy-light uppercase tracking-widest text-xs flex items-center justify-center gap-2 mt-2"
+                className="w-full py-4 md:py-3 bg-navy text-white rounded-2xl font-bold shadow-lg shadow-navy/20 active:scale-[0.98] transition hover:bg-navy-light uppercase tracking-widest text-xs flex items-center justify-center gap-2 mt-2"
               >
                 {loading ? (
                   <>
@@ -195,7 +195,7 @@ const AuthPage: React.FC<Props> = ({ onAuthSuccess }) => {
           </div>
 
           {/* Footer Area */}
-          <div className="bg-gray-50 p-6 flex flex-col items-center justify-center gap-3 border-t border-gray-100">
+          <div className="bg-gray-50 p-6 md:p-4 flex flex-col items-center justify-center gap-3 border-t border-gray-100">
              <button 
                onClick={handleGuestLogin}
                disabled={loading}
