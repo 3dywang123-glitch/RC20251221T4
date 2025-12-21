@@ -182,8 +182,8 @@ const ChatPage: React.FC<Props> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-cream relative overflow-hidden">
-      
+    <div className="flex flex-col min-h-screen bg-cream relative overflow-hidden pb-12">
+
       {/* 1. Slogan */}
       <div className="flex-shrink-0 bg-cream pt-1.5 px-6 z-20 relative">
          <div className="flex flex-col items-center justify-center animate-fade-in">
@@ -319,11 +319,11 @@ const ChatPage: React.FC<Props> = ({
       </div>
 
       {/* Footer - COMPACT INPUT AREA */}
-      <div className="bg-white border-t border-gray-200 flex-shrink-0 z-20 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.03)] sticky bottom-0">
+      <div className="bg-white border-t border-gray-200 flex-shrink-0 z-20">
          
          {/* Suggested Replies Ribbon - Displays only one as requested */}
          {(localOptions.length > 0 || isGeneratingOptions) && (
-           <div className="px-4 py-2 bg-gray-50 border-b border-gray-100 max-h-48 overflow-y-auto">
+           <div className="px-4 py-2 bg-gray-50 border-b border-gray-100">
              <div className="flex justify-between items-center mb-1.5">
                 <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{t('chat.suggestedReplies')}</div>
                 <button 
