@@ -100,7 +100,7 @@ export const parseJSON = (text) => {
 };
 // ==================== V2 Analysis Services ====================
 // Smart Classification & Extraction
-export const classifyAndExtract = async (images, model = 'gemini-2.5-flash-preview') => {
+export const classifyAndExtract = async (images, model = 'gemini-3-flash-preview') => {
     const promptText = `
   You are an expert UI/UX Analyst for Asian Social Apps (WeChat, RedNote, Instagram).
   Analyze the **COLLECTION** of screenshots provided as a single dataset.
@@ -512,7 +512,7 @@ export const compressImage = async (base64Str, maxWidth = 800, quality = 0.6) =>
     return base64Str;
 };
 // Persona Reply for Chat Simulation
-export const generatePersonaReply = async (target, messages, model = 'gemini-2.0-flash-exp') => {
+export const generatePersonaReply = async (target, messages, model = 'gemini-3-flash-preview') => {
     const prompt = `
     You are an expert method actor and behavioral psychologist.
     Roleplay as ${target.name} based on their personality and respond to the last message.
