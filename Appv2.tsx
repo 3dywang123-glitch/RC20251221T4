@@ -437,10 +437,9 @@ function AppContent() {
                    setShowWelcome(false);
                    setView('directory');
                } else {
-                   setShowWelcome(false);
-                   setView('auth');
+                   handleGuestEntry('directory');
                }
-           }} 
+           }}
            isLoading={loading}
          />
        );

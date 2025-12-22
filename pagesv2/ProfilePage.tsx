@@ -771,11 +771,11 @@ const ProfilePage: React.FC<Props> = ({
                     typeColor = "blue";
                     typeTitle = t('reports.types.social');
                     typeTags = item.reportTags || [];
-                 } else if (item.type === 'post') {
-                    typeIcon = <ZapIcon className="w-4 h-4" />;
-                    typeColor = "gold";
-                    typeTitle = t('reports.types.post');
-                    typeTags = item.tags || [];
+} else if (item.type === 'post') {
+  typeIcon = <ZapIcon className="w-4 h-4" />;
+  typeColor = "gold-dark";
+  typeTitle = t('reports.types.post');
+  typeTags = item.tags || [];
                  } else if (item.type === 'consult') {
                     typeIcon = <BrainIcon className="w-4 h-4" />;
                     typeColor = "purple";

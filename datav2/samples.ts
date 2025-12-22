@@ -182,8 +182,8 @@ export const SAMPLE_TARGET_2: TargetProfile = {
   occupation: '古典舞专业 / 兼职模特',
   bio: 'INFP. 舞台上是主角，台下是透明人。日常社恐，内心弹幕刷屏。喜欢雨天和古诗词。',
   socialMediaData: [],
-  // Using DiceBear for frontend-only avatar generation
-  avatarB64: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Vivi&top=longHairStraight&hairColor=2c1b18&clothing=collarAndSweater&clothingColor=ffdfbf&skinColor=f5d0b0&accessories=none',
+  // Using local image for avatar
+  avatarB64: '/samp2.jpg',
   personalityReport: {
     bigFive: { openness: 88, conscientiousness: 60, extraversion: 10, agreeableness: 90, neuroticism: 95 },
     mbti: "INFP",
