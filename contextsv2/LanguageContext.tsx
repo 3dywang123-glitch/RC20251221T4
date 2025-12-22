@@ -16,7 +16,7 @@ interface LanguageContextProps {
 const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('en');
+  const [language, setLanguage] = useState<Language>('cn');
   const translations = language === 'en' ? en : zh;
 
   const t = (path: string, options?: Record<string, string | number>) => {
