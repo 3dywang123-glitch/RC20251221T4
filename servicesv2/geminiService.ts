@@ -295,10 +295,11 @@ export const analyzeImageContent = async (imageB64: string): Promise<string> => 
 // ==================== Chat Simulation ====================
 export const generatePersonaReply = async (
   target: TargetProfile,
-  messages: { sender: string; text: string }[]
+  messages: { sender: string; text: string }[],
+  language: string = 'en'
 ): Promise<{ reply: string; insight: string }> => {
-  const result = await aiAPI.generatePersonaReply(target, messages, getPreferredModel());
-  
+  const result = await aiAPI.generatePersonaReply(target, messages, language, getPreferredModel());
+
   return {
     reply: result.reply || "...",
     insight: result.insight || ""

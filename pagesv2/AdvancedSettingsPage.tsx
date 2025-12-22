@@ -115,11 +115,11 @@ const AdvancedSettingsPage: React.FC<Props> = ({ onBack, onTestLoading, onViewHe
 
                <div className="flex flex-col gap-2">
                   <div className="flex bg-gray-50 rounded-xl p-1 border border-gray-100 gap-1">
-                      <button 
-                        onClick={() => handleAnalysisModelChange('gemini-3-pro-preview')}
-                        className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${analysisModel === 'gemini-3-pro-preview' ? 'bg-navy text-white shadow-sm' : 'text-gray-400 hover:text-navy'}`}
+                      <button
+                        onClick={() => handleAnalysisModelChange('gemini-3-flash-preview')}
+                        className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${analysisModel === 'gemini-3-flash-preview' ? 'bg-navy text-white shadow-sm' : 'text-gray-400 hover:text-navy'}`}
                       >
-                        Gemini 3 Pro
+                        Gemini 3 Flash
                       </button>
                       <button 
                         onClick={() => handleAnalysisModelChange('gemini-3-flash-preview')}

@@ -201,7 +201,7 @@ export const analyzeSinglePost = async (content: string, images: string[], suppl
          console.warn("Rate limit hit for single post analysis, retrying with Gemini 2.0 Flash Exp.");
          try {
             const fallbackResponse = await callAI({
-              model: 'gemini-2.0-flash-exp',
+              model: 'gemini-3-flash-preview',
               prompt: fullPrompt,
               images: compressedImages,
               responseFormat: 'json'

@@ -1,28 +1,19 @@
 // API Configuration for V2
-
-// 注意：这里指的是后端的地址。即使您的前端是 lianaiguwen.top，后端依然是 bbv2.zeabur.app
-// 除非您把后端也绑定到了新域名（比如 api.lianaiguwen.top），否则保持这个不变。
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://bbv2.zeabur.app/api';
 
 // Get auth token from localStorage
 const getAuthToken = (): string | null => {
-  // ✅ 关键修复：优先读取 'token' (这是之前 storageService 保存的 Key)，
-  // 如果没有，再尝试读取 'soulsync_auth_token' (旧 Key)
-  return localStorage.getItem('token') || localStorage.getItem('soulsync_auth_token');
+  return localStorage.getItem('soulsync_auth_token');
 };
 
 // Set auth token
 export const setAuthToken = (token: string) => {
-  // ✅ 双重保存，确保兼容性
-  localStorage.setItem('token', token);
   localStorage.setItem('soulsync_auth_token', token);
 };
 
 // Clear auth token
 export const clearAuthToken = () => {
-  localStorage.removeItem('token');
   localStorage.removeItem('soulsync_auth_token');
-  localStorage.removeItem('soulsync_session');
 };
 
 // API request helper with timeout and retry
@@ -59,11 +50,6 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}, retries =
         return apiRequest(endpoint, options, retries - 1);
       }
       
-      // Handle 401 Unauthorized (Auto-logout logic could go here)
-      if (response.status === 401) {
-          console.warn('Unauthorized access. Token may be invalid.');
-      }
-
       throw new Error(error.error || `HTTP ${response.status}`);
     }
 
@@ -87,12 +73,14 @@ export const authAPI = {
       body: JSON.stringify({ username, email, password, guestId }),
     });
   },
+
   login: async (email: string, password: string) => {
     return apiRequest('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
   },
+
   guestLogin: async () => {
     return apiRequest('/auth/guest', {
       method: 'POST',
@@ -105,12 +93,14 @@ export const userAPI = {
   getProfile: async () => {
     return apiRequest('/user/profile');
   },
+
   updateProfile: async (profile: any) => {
     return apiRequest('/user/profile', {
       method: 'PUT',
       body: JSON.stringify(profile),
     });
   },
+
   getPayments: async () => {
     return apiRequest('/user/payments');
   },
@@ -121,44 +111,52 @@ export const targetAPI = {
   list: async () => {
     return apiRequest('/targets');
   },
+
   get: async (id: string) => {
     return apiRequest(`/targets/${id}`);
   },
+
   create: async (target: any) => {
     return apiRequest('/targets', {
       method: 'POST',
       body: JSON.stringify(target),
     });
   },
+
   update: async (id: string, target: any) => {
     return apiRequest(`/targets/${id}`, {
       method: 'PUT',
       body: JSON.stringify(target),
     });
   },
+
   delete: async (id: string) => {
     return apiRequest(`/targets/${id}`, {
       method: 'DELETE',
     });
   },
+
   savePersonalityReport: async (id: string, report: any) => {
     return apiRequest(`/targets/${id}/personality`, {
       method: 'POST',
       body: JSON.stringify(report),
     });
   },
+
   saveSocialAnalysis: async (id: string, analysis: any) => {
     return apiRequest(`/targets/${id}/social-analysis`, {
       method: 'POST',
       body: JSON.stringify(analysis),
     });
   },
+
   savePostAnalysis: async (id: string, analysis: any) => {
     return apiRequest(`/targets/${id}/post-analysis`, {
       method: 'POST',
       body: JSON.stringify(analysis),
     });
   },
+
   saveRelationshipReport: async (id: string, report: any) => {
     return apiRequest(`/targets/${id}/relationship-report`, {
       method: 'POST',
@@ -172,12 +170,14 @@ export const chatAPI = {
   getMessages: async (targetId: string) => {
     return apiRequest(`/chat/${targetId}`);
   },
+
   saveMessage: async (targetId: string, message: any) => {
     return apiRequest(`/chat/${targetId}`, {
       method: 'POST',
       body: JSON.stringify(message),
     });
   },
+
   clearHistory: async (targetId: string) => {
     return apiRequest(`/chat/${targetId}`, {
       method: 'DELETE',
@@ -264,8 +264,7 @@ export const aiAPI = {
   },
 
   // Persona Reply for Chat Simulation
-  // ✅ 关键修改：添加了 language 参数，确保能传递 'cn' 给后端
-  generatePersonaReply: async (target: any, messages: any[], language: string = 'en', model?: string) => {
+  generatePersonaReply: async (target: any, messages: any[], language?: string, model?: string) => {
     return apiRequest('/ai/v2/persona-reply', {
       method: 'POST',
       body: JSON.stringify({ target, messages, language, model }),

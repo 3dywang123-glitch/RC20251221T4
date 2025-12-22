@@ -113,7 +113,7 @@ export const generateRelationshipReport = async (
           // Fallback/Retry with Flash
           console.warn("Consultation quota exceeded, retrying with Gemini 2.0 Flash Exp.");
           const fallbackResponse = await callAI({
-            model: 'gemini-2.0-flash-exp',
+            model: 'gemini-3-flash-preview',
             prompt: prompt,
             images: compressedChatImages,
             responseFormat: 'json'
