@@ -49,7 +49,10 @@ export const callAI = async (options: AICallOptions): Promise<AIResponse> => {
       }
     ],
     temperature: 0.7,
-    max_tokens: 8000
+    max_tokens: 8000,
+    thinkingConfig: {
+      thinkingBudget: 0
+    }
   };
 
   // Add response format for JSON mode
@@ -125,17 +128,17 @@ export const parseJSON = (text: string): Record<string, any> => {
 // ==================== V2 Analysis Services ====================
 
 // Smart Classification & Extraction
-export const classifyAndExtract = async (images: string[], model: string = 'gemini-2.5-flash-image') => {
+export const classifyAndExtract = async (images: string[], model: string = 'gemini-3-flash-preview') => {
   const promptText = `
   You are an expert UI/UX Analyst for Asian Social Apps (WeChat, RedNote, Instagram).
   Analyze the **COLLECTION** of screenshots provided as a single dataset.
-  
-  **MISSION**: 
+
+  **MISSION**:
   1. Determine the **DOMINANT** screen type across all images.
   2. Extract the **TARGET USER'S** profile info by synthesizing text from all images.
 
   **CLASSIFICATION RULES (Priority Order)**:
-  
+
   1. **"CHAT" (Conversation Logs)** - Speech bubbles, alternating rows, bottom input bar.
   2. **"PROFILE" (User Home / Feed)** - Large Avatar + Bio + Stats at the top. Vertical list of posts.
   3. **"POST" (Single Content Detail / Moment)** - Focused view of ONE main post with comments.
@@ -144,7 +147,7 @@ export const classifyAndExtract = async (images: string[], model: string = 'gemi
   **EXTRACTION TASK**:
   - **NAME**: Look for the username.
   - **BIO/INFO**: Scan all images for Age, Occupation, or Bio text tags.
-  - **AVATAR_BOX & SOURCE**: 
+  - **AVATAR_BOX & SOURCE**:
     - Identify the TARGET USER'S avatar (NOT the app owner's/self).
     - Return avatarBox [ymin, xmin, ymax, xmax] (0-1000).
     - Return avatarSourceIndex: The 0-based index of the image containing this best avatar.
@@ -164,10 +167,13 @@ export const classifyAndExtract = async (images: string[], model: string = 'gemi
   }
 `;
 
+  // Compress images to 800px width for faster transmission
+  const compressedImages = await Promise.all(images.map(img => compressImage(img, 800)));
+
   const response = await callAI({
     model,
     prompt: promptText,
-    images,
+    images: compressedImages,
     responseFormat: 'json'
   });
 
@@ -209,31 +215,26 @@ export const analyzeProfileOverview = async (
       
       **GLOBAL REQUIREMENT FOR SECTIONS 1-4**:
       For the first four sections, write a **CONCISE BUT DEEP** analysis (approx 150-200 words per section).
+      Do not waste words. Every sentence must provide a psychological insight.
+      Go beyond surface facts. Analyze the *psychological needs* (e.g., validation, safety, dominance) and *emotional vulnerabilities* hidden behind the posts.
 
       --- ANALYSIS SECTIONS (Map to JSON) ---
 
-      1. **Surface vs. Subtext**: [Decode the Visual Semiotics. Describe the aesthetic and what it signals.]
+      1. **Surface vs. Subtext**: 
+         [Write a deep analysis (150-200 words). Decode the **Visual Semiotics**. Describe the aesthetic (e.g. "Muted Luxury", "Cyberpunk") and what it signals. Contrast the "Curated Grid" with the likely "Chaotic Reality". Analyze the **Specific Insecurity** this aesthetic is trying to cover up.]
       
-      2. **Target Audience**: [Who is this performance designed for? Analyze the Signaling Strategy.]
+      2. **Target Audience**: 
+         [Write a deep analysis (150-200 words). Who is this performance designed for? (e.g. "Ex-partners", "Rivals", "High-Value Mates"). Analyze the **Signaling Strategy**: Is it "Broadcasting" for attention or "Narrowcasting" to a specific type? Decode the specific **Mating Call** or **Status Signal** hidden in the content.]
       
-      3. **Persona & Impression**: [Name the Character. Infer Big Five traits. Analyze the Shadow Self.]
+      3. **Persona & Impression**: 
+         [Write a deep analysis (150-200 words). Name the Character (e.g., "The Stoic Founder", "The Chill Girl"). Infer the Big Five traits from their posting habits. Analyze the **Shadow Self**: What part of their personality are they *desperately* trying to hide from the world?]
       
-      4. **Performance & Purpose**: [Analyze the "Return on Investment". What Emotional Currency are they farming?]
+      4. **Performance & Purpose**: 
+         [Write a deep analysis (150-200 words). Analyze the "Return on Investment" for their posts. What specific **Emotional Currency** are they farming? (e.g. Intellect validation, Sexual validation, Pity). Identify the **Core Emotional Void** they are trying to fill through digital approval.]
       
-      5. **Suggested Replies / Opening Lines**: 3 distinct, high-EQ DMs based on this analysis.
-
-      **RESPONSE FORMAT (JSON ONLY)**:
-      {
-        "platform": "string",
-        "handle": "string",
-        "timeframe": "string",
-        "reportTags": ["string"],
-        "surfaceSubtext": "string",
-        "targetAudience": "string",
-        "personaImpression": "string",
-        "performancePurpose": "string",
-        "suggestedReplies": ["string"]
-      }
+      5. **Suggested Replies / Opening Lines**: 
+         - 3 distinct, high-EQ DMs to slide into their inbox based on this analysis.
+         - (1. Casual/Low pressure, 2. Direct/Confident, 3. Insightful/Deep).
     `;
 
   const response = await callAI({
@@ -296,40 +297,52 @@ export const analyzePost = async (
   **IMPORTANT**: ${langInstruction}
 
   **MISSION**: Perform a **Deep, Expansive** analysis of the provided social media post. 
-  **CRITICAL**: Do NOT just describe the image. Interpret **WHY** it was posted.
+  **CRITICAL**: Do NOT just describe the image. Interpret **WHY** it was posted. Decode the "Digital Body Language".
 
   **TONE**: Perceptive, Witty, Insightful, and Empathetic.
 
   **ANALYSIS STRUCTURE (Markdown in JSON)**:
 
+  The 'analysis' string MUST use the EXACT headers defined below. 
+  **DO NOT USE SUB-HEADERS**. 
+  
+  **GLOBAL REQUIREMENT FOR SECTIONS 1-4**:
+  For the first four sections, you MUST write an **EXTENDED, HIGH-RESOLUTION** deep dive (approx 250-300 words per section). 
+  Do not just list features. Construct a rich, cohesive narrative.
+  Weave your observations (lighting, messy corners, caption irony, time of day) into a seamless story.
+  Use **bold text** to highlight key psychological insights within the paragraphs.
+
   ### ${headers.h1}
-  [Analyze the environment, lighting, chaos vs order. Approx 250-300 words.]
+  [Analyze the environment, lighting (natural vs artificial), and the chaos vs order in the background. Analyze the "Psychological Time" of the post—why *this* specific moment? Look for "Ghost Objects" (extra glasses, reflections, shadows). Decode the aesthetic effort: is it "Effortless" or "Calculated"? Tell the full story of the scene.]
 
   ### ${headers.h2}
-  [Decode the friction between the visual and the textual. 250-300 words.]
+  [Decode the friction between the visual and the textual. Is the caption a "Sub-tweet" or lyrics masking a specific complaint? Identify the **Specific Hook** (The Bait). Are they fishing for compliments, curiosity, jealousy, or pity? Analyze the emotional leakage in punctuation and emojis. What are they *not* saying?]
 
   ### ${headers.h3}
-  [Profile the Hidden Audience. 250-300 words.]
+  [Profile the **Hidden Audience**. Is this a "Broadcast" to the world, or a "Sniper Shot" aimed at an Ex, a Crush, or a Rival? Analyze the **Directionality** of the signal. Are they signaling Singlehood, High Status, or Vulnerability? Who is supposed to see this and feel something?]
 
   ### ${headers.h4}
-  [Define the Persona Construction. 250-300 words.]
+  [Define the **Persona Construction**. What archetype are they cosplaying (e.g., "The Unbothered Queen", "The Hustler", "The Victim")? Analyze the **Gap** between their "Stage Self" and reality. How do they *desperately* want to be perceived vs how they *actually* come across? Deconstruct their "Impression Management" strategy.]
 
   ### ${headers.h5}
-  [Write a strategic summary. Approx 150 words.]
+  [Write a strategic summary (approx 150 words). Identify the **Core Drive** (Validation, Venting, Connection, Boredom). Assess their **State of Mind** (Vulnerable? High-Status?). Give a final **Strategic Verdict** on the value of this post and whether to engage.]
+
+  ---
 
   **REPLY GENERATION RULES**:
-  Generate 3 distinct types of replies:
-  1. **The Playful Challenge**: Lighthearted, slightly teasing.
-  2. **The Resonator**: Validates the hidden emotion.
-  3. **The Curiosity Hook**: A low-friction question demanding a reply.
+  Generate 3 distinct types of replies (Short, Natural, Low-Demand):
+
+  1.  **The Playful Challenge**: Lighthearted, slightly teasing, or challenging their frame in a fun way.
+  2.  **The Resonator**: Validates the *hidden* emotion (not the surface one). "I see the real you."
+  3.  **The Curiosity Hook**: A low-friction question related to a detail in the photo that demands a reply.
 
   **OUTPUT JSON**:
   {
-    "analysis": "string (The Markdown analysis)",
+    "analysis": "string (The Markdown analysis above)",
     "suggestedReplies": ["String 1", "String 2", "String 3"],
     "tags": ["#Tag1", "#Tag2", "#RiskLevel:High/Low"]
   }
-`;
+`
 
   const finalPrompt = content ? `Caption: "${content}"\n\n${prompt}` : prompt;
 
@@ -385,9 +398,9 @@ export const analyzeChatLog = async (
 
   **IMPORTANT**: ${langInstruction}
 
-  **MISSION**: Do not just summarize the conversation. Interpret the subtext. Identify the "Unspoken Contract".
+  **MISSION**: Do not just summarize the conversation. Interpret the subtext. Identify the "Unspoken Contract" between these two people. Detect insecurities, hidden agendas, and attachment triggers.
 
-  **TONE**: Professional, Objective, Honest, High-Resolution.
+  **TONE**: Professional, Objective, Honest, High-Resolution. Avoid generic advice.
 
   --- CASE FILE ---
   ${target.name ? `- Target: ${target.name} (${target.age || '?'} / ${target.gender || '?'} / ${target.occupation || '?'})` : ''}
@@ -398,27 +411,53 @@ export const analyzeChatLog = async (
   "${context.chatLogs}"
 
   **CRITICAL RULES**:
-  1. **Subtext Over Text**: Focus on latency, investment, tone shifts.
+  1. **Subtext Over Text**: Focus on *latency* (time gaps), *investment* (message length), and *tone shifts*.
   2. **Honesty**: If the relationship dynamic is unbalanced, state it clearly.
-  3. **Evidence-Based**: Refer to specific messages as evidence.
+  3. **Evidence-Based**: When analyzing personality, refer to specific messages as evidence.
   4. **Structure**: Write LONG, DENSE, NARRATIVE paragraphs.
-  5. **Psychological Frameworks**: Use terms like Anxious-Avoidant, Reciprocity, Validation Seeking.
+  5. **Psychological Frameworks**: Use terms like *Anxious-Avoidant*, *Reciprocity*, *Validation Seeking*.
 
   **OUTPUT STRUCTURE (JSON ONLY)**:
   {
-    "compatibilityScore": 0,
-    "statusAssessment": "String",
-    "partnerPersonalityAnalysis": "String",
-    "greenFlags": ["String"],
-    "redFlags": ["String"],
-    "communicationDos": ["String"],
-    "communicationDonts": ["String"],
-    "magicTopics": ["String"],
-    "strategy": "Markdown with headers ### ${headers.h1} through ### ${headers.h6}",
-    "dateIdeas": [{ "title": "String", "description": "String" }],
-    "tags": ["#Tag"]
+    "compatibilityScore": 0, // Integer 0-100. Be realistic.
+    "statusAssessment": "String (One sentence summary: e.g., 'Friendzone with potential' or 'High-tension flirtation')",
+    "partnerPersonalityAnalysis": "String (Profile their Archetype: e.g., 'The Distant Avoidant' or 'The Validation Seeker'. Explain their fears and desires.)",
+
+    "greenFlags": ["String (Quote specific text)", "String"],
+    "redFlags": ["String (Quote specific text - look for inconsistencies)", "String"],
+
+    "communicationDos": ["String (High-value behaviors)", "String"],
+    "communicationDonts": ["String (Low-value/Needy behaviors)", "String"],
+    "magicTopics": ["String (Topics that trigger their 'Flow State')", "String"],
+
+    "strategy": "
+      ### ${headers.h1}
+      [DIAGNOSIS: Write a dense paragraph (150 words). Define the **Current Emotional Distance**. Is the target leaning in or pulling away? Use **bold** to highlight the 'Clinical Diagnosis' of the relationship health.]
+
+      ### ${headers.h2}
+      [DECODING THE PSYCHE: Write a deep dive (200 words). Analyze their **Defense Mechanisms**. Are they acting cool to hide insecurity? Analyze their **Core Ego Need** (Validation? Safety? Thrill?). Reveal what they are *thinking* but not *saying*.]
+
+      ### ${headers.h3}
+      [POWER DYNAMICS: Write a strategic assessment (150 words). Who is the 'Prize'? Analyze the **Investment Ratio** (who is texting more?). Identify if the user is Over-pursuing or too cold. Pinpoint the exact moment power shifted.]
+
+      ### ${headers.h4}
+      [RISK ANALYSIS: Write a warning paragraph (150 words). What is the **#1 Mistake** the user is committing? (e.g., Being too available, boring interrogations). Explain the psychological consequence if they don't stop.]
+
+      ### ${headers.h5}
+      [TACTICAL PLAN: Write a concrete action plan (200 words). Provide **Specific 'Copy-Paste' Scripts**. Draft a text that uses *Push-Pull* psychology to re-engage them. Explain the *Why* behind the script.]
+
+      ### ${headers.h6}
+      [FINAL VERDICT: One decisive sentence. Is this worth pursuing?]
+    ",
+
+    "dateIdeas": [
+      { "title": "String", "description": "String (Must match their personality. e.g., 'High-Adrenaline' for thrill seekers, 'Cozy-Intimate' for avoidants)" },
+      { "title": "String", "description": "String" }
+    ],
+
+    "tags": ["#AttachmentStyle", "#PowerDynamic", "#PsychProfile"]
   }
-`;
+`
 
   const response = await callAI({
     model,
@@ -511,38 +550,45 @@ export const analyzePersonalityV2 = async (
   ${deepContext}
 
   **CORE DIRECTIVE**: 
-  - **SYNTHESIZE**: Use the "INTELLIGENCE SOURCES".
-  - **THE "PAIN GAP"**: Analyze the psychological cost of their mask.
-  - **CONSISTENCY**: Ensure JSON numerical scores align with narrative analysis.
+  - **SYNTHESIZE**: Use the "INTELLIGENCE SOURCES". Do not ignore them.
+  - **THE "PAIN GAP"**: If the Social Analysis says they seek attention, and the Consult Report says they are avoidant, do not just note it. **Analyze the psychological cost** of this mask. (e.g., "They perform confidence to hide a fear of abandonment").
+  - **CONSISTENCY**: Ensure your JSON numerical scores (Big Five) strictly align with your narrative analysis.
 
   **REQUIRED OUTPUT STRUCTURE**:
 
-  1. **'summary' Field** MUST contain these 3 SPECIFIC HEADERS:
+  1. **'summary' Field** MUST contain these 3 SPECIFIC HEADERS (starts with ###). 
 
      ### ${headers.archetype}
-     [Name their psychological archetype. Write a powerful narrative summary.]
+     [Name their specific psychological archetype (e.g., "The Anxious-Preoccupied High Achiever"). Write a powerful, narrative summary of who they are behind the mask. Connect their public persona (Social Analysis) with their private reality (Post/Consult Analysis).]
 
      ### ${headers.bigFive}
-     [Analyze their Big Five traits based on evidence.]
+     [Analyze their Big Five traits based on the evidence. Do not just list scores. Explain HOW their specific combination (e.g., High Neuroticism + High Openness) manifests in their life and relationships.]
 
-     ### ${headers.decoding}
-     [CRITICAL: 300-400 words. Deep psychological narrative.]
+      ### ${headers.decoding}
+      [**CRITICAL INSTRUCTION**: This section must be **SIGNIFICANTLY EXPANDED (increase length by 55%)**. 
+      Write a deep psychological narrative (approx 300-400 words). 
+      **Do NOT use rigid sub-headers**. instead, create a **Narrative Arc**:
+      1. Start with their **Cognitive Engine** (How they process reality).
+      2. Move to their **Emotional Core/Void** (What they lack).
+      3. End with their **Attachment Triggers** (What makes them run vs. stay).
+      Weave these into a profound essay that feels like a biography of their soul.]
 
   2. **'datingAdvice' Field**:
-     [Actionable strategy. Use **Bold Labels** instead of headers.]
+      [Provide actionable strategy. 
+      **FORMATTING RULE**: Do NOT use Markdown Headers (###). Instead, use **Bold Labels** (e.g., **Communication Strategy:**, **The Red Flag:**) to organize the text into clean, readable blocks.]
 
   **RESPONSE FORMAT (JSON ONLY)**:
   {
     "bigFive": { "openness": 0-100, "conscientiousness": 0-100, "extraversion": 0-100, "agreeableness": 0-100, "neuroticism": 0-100 },
     "mbti": "string",
     "emotionalStability": 0-100,
-    "coreInterests": ["string"],
+    "coreInterests": ["string", "string"],
     "communicationStyle": "string",
     "summary": "string (Contains headers ### 1, ### 2, ### 3)",
-    "datingAdvice": "string (NO headers)",
+    "datingAdvice": "string (Content ONLY, NO headers)",
     "avatarAnalysis": "string",
     "dataSufficiency": 0-100,
-    "tags": ["#Tag"]
+    "tags": ["#Tag1", "#Tag2"]
   }
 `;
 
@@ -616,28 +662,45 @@ export const generatePersonaReply = async (
     : 'Respond in English.';
 
   const prompt = `
-    You are an expert method actor and behavioral psychologist.
-    Roleplay as ${target.name} based on their personality and respond to the last message.
+  You are an Expert Method Actor and Behavioral Psychologist.
+  Your goal is to simulate a hyper-realistic text messaging conversation.
 
-    **IMPORTANT**: ${langInstruction}
+  --- ROLEPLAY PROFILE ---
+  Name: ${target.name}
+  Age/Job: ${target.age || 'Unknown'}, ${target.occupation || 'Unknown'}
+  
+  [Core Identity]
+  MBTI: ${mbti}
+  Personality: "${personalitySummary}"
+  
+  [Texting DNA - CRITICAL]
+  Style: "${communicationStyle}"
+  Social Vibe: "${socialVibe}"
+  
+  --- DYNAMIC INSTRUCTIONS ---
+  
+  1. **Analyze Context**: Read the chat history. specifically the User's LAST message. 
+     - Is the user high-value/interesting? -> Reward with warmth/emojis.
+     - Is the user boring/needy? -> Punish with shorter, drier replies.
+  
+  2. **Mimic "Micro-Habits"**:
+     - **Case**: Do they type in lowercase? Proper grammar? 
+     - **Punctuation**: Do they use "..." or "!" or no punctuation?
+     - **Latency**: If they are "playing hard to get", the reply should feel like it took time (longer content) or was rushed (typos/short).
+  
+  3. **Reply Content**: 
+     - Keep it SHORT. Real texts are rarely paragraphs.
+     - STAY IN CHARACTER. Do not be an AI. Do not be overly helpful. Be human (flawed, emotional, busy).
 
-    Target Profile:
-    - Name: ${target.name}
-    - Age: ${target.age}
-    - Occupation: ${target.occupation}
-    - Bio: ${target.bio}
-    ${target.personalityReport ? `- MBTI: ${target.personalityReport.mbti}` : ''}
-    ${target.personalityReport ? `- Communication Style: ${target.personalityReport.communicationStyle}` : ''}
+  --- CONVERSATION LOG ---
+  ${messages.slice(-15).map(m => `${m.sender === 'user' ? 'User' : target.name}: ${m.text}`).join('\n')}
 
-    Recent conversation:
-    ${messages.slice(-5).map(m => `${m.sender}: ${m.text}`).join('\n')}
-
-    OUTPUT FORMAT (JSON):
-    {
-      "reply": "${isCn ? '角色的短信回复' : 'The character\'s text message reply'}",
-      "insight": "${isCn ? '心理潜台词分析' : 'Psychological subtext analysis'}"
-    }
-  `;
+  --- OUTPUT FORMAT (Strict JSON) ---
+  {
+    "reply": "The actual text message content (String). MUST match the language used by ${target.name} in the conversation log above.",
+    "insight": "One punchy sentence analyzing the power dynamic (e.g., 'She is testing your confidence' or 'She is bored by the topic'). MUST BE IN ${insightLang}."
+  }
+`;
 
   const response = await callAI({
     model,
