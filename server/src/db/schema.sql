@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS user_profiles (
   avatar_b64 TEXT,
   additional_images TEXT[], -- Array of base64 images
   social_links TEXT,
-  ai_model_preference VARCHAR(100) DEFAULT 'gemini-2.0-flash-exp',
-  analysis_model_preference VARCHAR(100) DEFAULT 'gemini-3-pro-preview',
+  ai_model_preference VARCHAR(100) DEFAULT 'gemini-3-flash-preview',
+  analysis_model_preference VARCHAR(100) DEFAULT 'gemini-3-flash-preview',
   api_endpoint VARCHAR(255) DEFAULT 'https://hnd1.aihub.zeabur.ai/',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

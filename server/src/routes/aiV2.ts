@@ -145,7 +145,7 @@ router.post('/analyze-avatar', authenticate, async (req: AuthRequest, res: Respo
 // Persona Reply for Chat Simulation
 router.post('/persona-reply', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { target, messages, model } = req.body;
+    const { target, messages, language, model } = req.body;
 
     if (!target || !messages) {
       return res.status(400).json({ error: 'Target and messages are required' });
@@ -154,6 +154,7 @@ router.post('/persona-reply', authenticate, async (req: AuthRequest, res: Respon
     const result = await aiServiceV2.generatePersonaReply(
       target,
       messages,
+      language || 'en',
       model
     );
     res.json(result);
