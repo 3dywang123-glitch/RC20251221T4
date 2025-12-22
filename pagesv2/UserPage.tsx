@@ -443,7 +443,7 @@ export default function UserPage({ profile, userAuth, onUpdateProfile, onNavigat
       </div>
 
       <div className="text-center text-[10px] text-navy/30 pt-8 font-bold uppercase tracking-widest">
-         202512220015
+         20251222221630
       </div>
     </div>
   );
