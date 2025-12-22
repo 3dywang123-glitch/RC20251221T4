@@ -89,40 +89,59 @@ export const callAI = async (options: AICallOptions): Promise<AIResponse> => {
 
 // Robust JSON Parsing Helper (migrated from core.ts)
 export const parseJSON = (text: string): Record<string, any> => {
-  if (!text) return {};
-  
+  if (!text || typeof text !== 'string') return {};
+
   // Handle AI Refusals gracefully
   if (text.trim().startsWith("I am unable") || text.includes("unable to fulfill") || text.includes("I cannot")) {
      console.warn("AI Refusal detected:", text);
      return {};
   }
 
-  const attemptParse = (str: string) => {
+  const attemptParse = (str: string): Record<string, any> | null => {
     try {
-      let clean = str.replace(/```json\s*/g, '').replace(/```\s*$/g, '');
-      clean = clean.trim();
+      let clean = str.replace(/```json\s*/g, '').replace(/```\s*$/g, '').trim();
+      // Remove any trailing commas before closing braces/brackets
+      clean = clean.replace(/,(\s*[}\]])/g, '$1');
       return JSON.parse(clean);
     } catch (e) {
-      throw e;
+      return null;
     }
   };
 
-  try {
-    return attemptParse(text);
-  } catch (e) {
-    try {
-      const firstOpen = text.indexOf('{');
-      const lastClose = text.lastIndexOf('}');
-      if (firstOpen !== -1 && lastClose !== -1) {
-        const substring = text.substring(firstOpen, lastClose + 1);
-        return attemptParse(substring);
-      }
-    } catch (e2) {
-      // Ignore
-    }
-    console.error("Failed to parse JSON. Raw text:", text);
-    throw new Error("Invalid JSON response from AI");
+  // First attempt: parse the entire text
+  let result = attemptParse(text);
+  if (result) return result;
+
+  // Second attempt: extract JSON from code blocks
+  const jsonBlockRegex = /```(?:json)?\s*(\{[\s\S]*?\})\s*```/g;
+  let match;
+  while ((match = jsonBlockRegex.exec(text)) !== null) {
+    result = attemptParse(match[1]);
+    if (result) return result;
   }
+
+  // Third attempt: find the outermost JSON object
+  const firstOpen = text.indexOf('{');
+  const lastClose = text.lastIndexOf('}');
+  if (firstOpen !== -1 && lastClose !== -1 && lastClose > firstOpen) {
+    const substring = text.substring(firstOpen, lastClose + 1);
+    result = attemptParse(substring);
+    if (result) return result;
+  }
+
+  // Fourth attempt: try to fix common JSON issues
+  let fixedText = text;
+  // Remove markdown formatting that might interfere
+  fixedText = fixedText.replace(/\*\*(.*?)\*\*/g, '$1'); // Remove bold markdown
+  fixedText = fixedText.replace(/\*(.*?)\*/g, '$1'); // Remove italic markdown
+  // Ensure proper quote escaping
+  fixedText = fixedText.replace(/([^\\])"([^"]*)"([^,}\]]*[^\\])"([^"]*)"([^,}\]]*)/g, '$1"$2\\"$3\\"$4"$5'); // This is a simplified fix
+  result = attemptParse(fixedText);
+  if (result) return result;
+
+  // If all attempts fail, return a default object with the raw text
+  console.error("Failed to parse JSON after multiple attempts. Raw text:", text.substring(0, 500) + (text.length > 500 ? '...' : ''));
+  return { rawResponse: text, parseError: true };
 };
 
 // ==================== V2 Analysis Services ====================
