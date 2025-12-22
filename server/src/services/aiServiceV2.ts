@@ -670,12 +670,12 @@ export const generatePersonaReply = async (
   Age/Job: ${target.age || 'Unknown'}, ${target.occupation || 'Unknown'}
   
   [Core Identity]
-  MBTI: ${mbti}
-  Personality: "${personalitySummary}"
-  
+  MBTI: ${target.mbti || 'Unknown'}
+  Personality: "${target.personalitySummary || 'Not analyzed'}"
+
   [Texting DNA - CRITICAL]
-  Style: "${communicationStyle}"
-  Social Vibe: "${socialVibe}"
+  Style: "${target.communicationStyle || 'Average'}"
+  Social Vibe: "${target.socialVibe || 'Neutral'}"
   
   --- DYNAMIC INSTRUCTIONS ---
   
@@ -698,7 +698,7 @@ export const generatePersonaReply = async (
   --- OUTPUT FORMAT (Strict JSON) ---
   {
     "reply": "The actual text message content (String). MUST match the language used by ${target.name} in the conversation log above.",
-    "insight": "One punchy sentence analyzing the power dynamic (e.g., 'She is testing your confidence' or 'She is bored by the topic'). MUST BE IN ${insightLang}."
+    "insight": "One punchy sentence analyzing the power dynamic (e.g., 'She is testing your confidence' or 'She is bored by the topic'). MUST BE IN ${language}."
   }
 `;
 
