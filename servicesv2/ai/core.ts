@@ -40,14 +40,8 @@ export const getPreferredModel = (): string => {
 };
 
 // Get user preference for HEAVY analysis (Social, Consult, Personality)
+// Note: Currently always returns default model as placeholders don't affect actual functionality
 export const getAnalysisModel = (): string => {
-  if (typeof window !== 'undefined') {
-    const pref = localStorage.getItem('soulsync_analysis_model_preference');
-    // Ensure we only return valid Gemini models supported by the SDK
-    if (pref && pref.startsWith('gemini')) {
-        return pref;
-    }
-  }
   return 'gemini-3-flash-preview';
 };
 

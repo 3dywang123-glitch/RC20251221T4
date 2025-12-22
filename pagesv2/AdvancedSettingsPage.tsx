@@ -116,12 +116,12 @@ const AdvancedSettingsPage: React.FC<Props> = ({ onBack, onTestLoading, onViewHe
                <div className="flex flex-col gap-2">
                   <div className="flex bg-gray-50 rounded-xl p-1 border border-gray-100 gap-1">
                       <button
-                        onClick={() => handleAnalysisModelChange('gemini-3-flash-preview')}
-                        className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${analysisModel === 'gemini-3-flash-preview' ? 'bg-navy text-white shadow-sm' : 'text-gray-400 hover:text-navy'}`}
+                        onClick={() => handleAnalysisModelChange('gemini-3-pro')}
+                        className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${analysisModel === 'gemini-3-pro' ? 'bg-navy text-white shadow-sm' : 'text-gray-400 hover:text-navy'}`}
                       >
-                        Gemini 3 Flash
+                        Gemini 3 Pro
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleAnalysisModelChange('gemini-3-flash-preview')}
                         className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${analysisModel === 'gemini-3-flash-preview' ? 'bg-navy text-white shadow-sm' : 'text-gray-400 hover:text-navy'}`}
                       >
@@ -129,17 +129,17 @@ const AdvancedSettingsPage: React.FC<Props> = ({ onBack, onTestLoading, onViewHe
                       </button>
                   </div>
                   <div className="flex bg-gray-50 rounded-xl p-1 border border-gray-100 gap-1">
-                      <button 
-                        onClick={() => handleAnalysisModelChange('gpt-5')}
-                        className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${analysisModel === 'gpt-5' ? 'bg-navy text-white shadow-sm' : 'text-gray-400 hover:text-navy'}`}
+                      <button
+                        onClick={() => handleAnalysisModelChange('chatgpt-5-2')}
+                        className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${analysisModel === 'chatgpt-5-2' ? 'bg-navy text-white shadow-sm' : 'text-gray-400 hover:text-navy'}`}
                       >
-                        GPT-5
+                        ChatGPT 5.2
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleAnalysisModelChange('claude-sonnet-4-5')}
                         className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${analysisModel === 'claude-sonnet-4-5' ? 'bg-navy text-white shadow-sm' : 'text-gray-400 hover:text-navy'}`}
                       >
-                        Claude Sonnet
+                        Claude Sonnet 4.5
                       </button>
                   </div>
                </div>

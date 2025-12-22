@@ -241,7 +241,7 @@ const AnalysisPage: React.FC<Props> = ({
 
   const submitChatlog = () => {
     const rawImages = chatImages.map(img => img.data);
-    if (!chatGoal && !chatLogsText && rawImages.length === 0) return;
+    if (!chatGoal && !chatLogsText.trim() && rawImages.length === 0) return;
     onRunConsult({ stage: RelationshipStage.TALKING, goal: chatGoal, duration: chatDuration, chatLogs: chatLogsText, chatImages: rawImages });
     setChatLogsText(''); setChatImages([]);
   };
@@ -325,7 +325,7 @@ const AnalysisPage: React.FC<Props> = ({
                     {!target.isSample && (
                       <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
                         <div className="flex gap-3 mb-4 overflow-x-auto no-scrollbar items-center pb-2">
-                            <label className={`${profileImages.length > 0 ? 'w-12 h-12 rounded-xl' : 'w-20 h-20 rounded-2xl'} bg-gold border-2 border-dashed border-[#D4C5A5] flex flex-col items-center justify-center gap-1 cursor-pointer flex-shrink-0`}>
+                            <label className={`${profileImages.length > 0 ? 'w-12 h-12 rounded-xl' : 'w-20 h-20 rounded-2xl'} bg-[#F5F2EA] border-2 border-dashed border-[#D4C5A5] flex flex-col items-center justify-center gap-1 cursor-pointer flex-shrink-0`}>
                               <UploadIcon className="text-navy" />
                               {profileImages.length === 0 && <span className="text-[8px] font-bold text-navy/60 uppercase">{t('analysis.import')}</span>}
                               <input type="file" className="hidden" accept="image/*" multiple onChange={(e) => handleImageUpload(e, setProfileImages)} />
@@ -339,7 +339,7 @@ const AnalysisPage: React.FC<Props> = ({
                         </div>
                         <label className="text-[10px] font-bold text-navy uppercase tracking-widest block mb-2 pl-1">{t('analysis.labels.supplementary')}</label>
                         <textarea className="w-full p-4 bg-[#F5F2EA] rounded-2xl text-xs font-medium text-navy outline-none min-h-[100px] resize-none mb-4" value={url} onChange={(e) => setUrl(e.target.value)} placeholder={t('analysis.contextPlaceholder.social')} />
-                        <button onClick={submitOverall} disabled={!url && profileImages.length === 0} className="w-full py-4 bg-navy text-white font-bold rounded-2xl shadow-lg hover:bg-navy-light transition flex items-center justify-center gap-2 disabled:opacity-50"><BrainIcon className="w-4 h-4" /><span>{t('analysis.buttons.analyzeProfile')}</span></button>
+                        <button onClick={submitOverall} disabled={!url.trim() && profileImages.length === 0} className="w-full py-4 bg-navy text-white font-bold rounded-2xl shadow-lg hover:bg-navy-light transition flex items-center justify-center gap-2 disabled:opacity-50"><BrainIcon className="w-4 h-4" /><span>{t('analysis.buttons.analyzeProfile')}</span></button>
                       </div>
                     )}
                     <div className="pt-6 border-t-2 border-dashed border-gray-200/60">
@@ -384,7 +384,7 @@ const AnalysisPage: React.FC<Props> = ({
                     {!target.isSample && (
                       <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
                         <div className="flex gap-3 mb-4 overflow-x-auto no-scrollbar items-center pb-2">
-                            <label className={`${postImages.length > 0 ? 'w-12 h-12 rounded-xl' : 'w-20 h-20 rounded-2xl'} bg-gold border-2 border-dashed border-[#D4C5A5] flex flex-col items-center justify-center gap-1 cursor-pointer flex-shrink-0`}>
+                            <label className={`${postImages.length > 0 ? 'w-12 h-12 rounded-xl' : 'w-20 h-20 rounded-2xl'} bg-[#F5F2EA] border-2 border-dashed border-[#D4C5A5] flex flex-col items-center justify-center gap-1 cursor-pointer flex-shrink-0`}>
                               <UploadIcon className="text-navy" />
                               {postImages.length === 0 && <span className="text-[8px] font-bold text-navy/60 uppercase">{t('analysis.import')}</span>}
                               <input type="file" className="hidden" accept="image/*" multiple onChange={(e) => handleImageUpload(e, setPostImages)} />
@@ -398,7 +398,7 @@ const AnalysisPage: React.FC<Props> = ({
                         </div>
                         <label className="text-[10px] font-bold text-navy uppercase tracking-widest block mb-2 pl-1">{t('analysis.labels.contextCaption')}</label>
                         <textarea className="w-full p-4 bg-[#F5F2EA] rounded-2xl text-xs font-medium text-navy outline-none min-h-[100px] resize-none mb-4" value={postText} onChange={(e) => setPostText(e.target.value)} placeholder={t('analysis.contextPlaceholder.post')} />
-                        <button onClick={submitPost} disabled={!postText && postImages.length === 0} className="w-full py-4 bg-navy text-white font-bold rounded-2xl shadow-lg hover:bg-navy-light transition flex items-center justify-center gap-2 disabled:opacity-50"><BrainIcon className="w-4 h-4" /><span>{t('analysis.buttons.decodeSubtext')}</span></button>
+                        <button onClick={submitPost} disabled={!postText.trim() && postImages.length === 0} className="w-full py-4 bg-navy text-white font-bold rounded-2xl shadow-lg hover:bg-navy-light transition flex items-center justify-center gap-2 disabled:opacity-50"><BrainIcon className="w-4 h-4" /><span>{t('analysis.buttons.decodeSubtext')}</span></button>
                       </div>
                     )}
                     <div className="pt-6 border-t-2 border-dashed border-gray-200/60">
@@ -443,7 +443,7 @@ const AnalysisPage: React.FC<Props> = ({
                     {!target.isSample && (
                       <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
                         <div className="flex gap-3 mb-4 overflow-x-auto no-scrollbar items-center pb-2">
-                            <label className={`${chatImages.length > 0 ? 'w-12 h-12 rounded-xl' : 'w-20 h-20 rounded-2xl'} bg-gold border-2 border-dashed border-[#D4C5A5] flex flex-col items-center justify-center gap-1 cursor-pointer flex-shrink-0`}>
+                            <label className={`${chatImages.length > 0 ? 'w-12 h-12 rounded-xl' : 'w-20 h-20 rounded-2xl'} bg-[#F5F2EA] border-2 border-dashed border-[#D4C5A5] flex flex-col items-center justify-center gap-1 cursor-pointer flex-shrink-0`}>
                               <UploadIcon className="text-navy" />
                               {chatImages.length === 0 && <span className="text-[8px] font-bold text-navy/60 uppercase">{t('analysis.import')}</span>}
                               <input type="file" className="hidden" accept="image/*" multiple onChange={(e) => handleImageUpload(e, setChatImages)} />
@@ -470,7 +470,7 @@ const AnalysisPage: React.FC<Props> = ({
                         </div>
                         <label className="text-[10px] font-bold text-navy uppercase tracking-widest block mb-2 pl-1">{t('analysis.labels.contextLogs')}</label>
                         <textarea className="w-full p-4 bg-[#F5F2EA] rounded-2xl text-xs font-medium text-navy outline-none min-h-[100px] resize-none mb-4" value={chatLogsText} onChange={(e) => setChatLogsText(e.target.value)} placeholder={t('analysis.contextPlaceholder.chat')} />
-                        <button onClick={submitChatlog} disabled={(!chatGoal && !chatLogsText && chatImages.length === 0)} className="w-full py-4 bg-navy text-white font-bold rounded-2xl shadow-lg hover:bg-navy-light transition flex items-center justify-center gap-2 disabled:opacity-50"><BrainIcon className="w-4 h-4" /><span>{t('analysis.buttons.analyzeChat')}</span></button>
+                        <button onClick={submitChatlog} disabled={!chatGoal && !chatLogsText.trim() && chatImages.length === 0} className="w-full py-4 bg-navy text-white font-bold rounded-2xl shadow-lg hover:bg-navy-light transition flex items-center justify-center gap-2 disabled:opacity-50"><BrainIcon className="w-4 h-4" /><span>{t('analysis.buttons.analyzeChat')}</span></button>
                       </div>
                     )}
                     <div className="pt-6 border-t-2 border-dashed border-gray-200/60">

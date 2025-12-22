@@ -177,17 +177,17 @@ const LoadingScreen: React.FC<Props> = ({ isLoading, text, type = 'default' }) =
 
         {/* 2. Tips Area (Top) - Gold/Emotional Theme */}
         <div className="w-full animate-slide-up">
-          <div 
+          <div
             onClick={handleNextTip}
-            className="bg-white/60 border border-white/50 px-6 py-6 rounded-2xl shadow-sm relative overflow-hidden backdrop-blur-sm text-center cursor-pointer active:scale-95 transition-all hover:bg-white/80 group select-none h-auto min-h-0"
+            className="bg-white/60 border border-white/50 px-4 py-4 rounded-2xl shadow-sm relative overflow-hidden backdrop-blur-sm text-center cursor-pointer active:scale-95 transition-all hover:bg-white/80 group select-none h-auto min-h-0 max-w-md mx-auto"
           >
-              <div className="absolute right-3 top-6 text-navy/20 group-hover:text-navy/50 transition-colors">
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 text-navy/20 group-hover:text-navy/50 transition-colors">
                  <ChevronRight className="w-4 h-4" />
               </div>
 
-              <div className={`flex items-start justify-center gap-4 transition-opacity duration-500 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
-                  <SparklesIcon className="w-5 h-5 text-gold flex-shrink-0 mt-0.5" />
-                  <p className="text-base text-navy font-semibold leading-relaxed flex items-center text-left whitespace-pre-line md:whitespace-normal pr-4">
+              <div className={`flex items-center justify-center gap-2 transition-opacity duration-500 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+                  <SparklesIcon className="w-5 h-5 text-gold flex-shrink-0" />
+                  <p className="text-base text-navy font-semibold leading-relaxed flex items-center text-left whitespace-pre-line md:whitespace-normal pr-2 line-clamp-2">
                     {randomizedTips[tipIndex] || "Analyzing psychological patterns..."}
                   </p>
               </div>
