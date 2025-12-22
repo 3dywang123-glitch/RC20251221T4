@@ -226,34 +226,47 @@ export const analyzeProfileOverview = async (
   const prompt = `
       You are an Elite Digital Forensic Psychologist & Profiler.
       Analyze the provided social media screenshots (e.g., WeChat Moments, Instagram) and context: ${url}.
-      
+
       **IMPORTANT**: ${langInstruction}
 
       **MISSION**: Decode the "Impression Management" strategy of this profile.
       **TONE**: Surgical, Incisive, Clinical but **Emotionally Deep**.
-      
+
       **GLOBAL REQUIREMENT FOR SECTIONS 1-4**:
       For the first four sections, write a **CONCISE BUT DEEP** analysis (approx 150-200 words per section).
       Do not waste words. Every sentence must provide a psychological insight.
       Go beyond surface facts. Analyze the *psychological needs* (e.g., validation, safety, dominance) and *emotional vulnerabilities* hidden behind the posts.
 
-      --- ANALYSIS SECTIONS (Map to JSON) ---
+      --- ANALYSIS SECTIONS ---
 
-      1. **Surface vs. Subtext**: 
+      1. **Surface vs. Subtext**:
          [Write a deep analysis (150-200 words). Decode the **Visual Semiotics**. Describe the aesthetic (e.g. "Muted Luxury", "Cyberpunk") and what it signals. Contrast the "Curated Grid" with the likely "Chaotic Reality". Analyze the **Specific Insecurity** this aesthetic is trying to cover up.]
-      
-      2. **Target Audience**: 
+
+      2. **Target Audience**:
          [Write a deep analysis (150-200 words). Who is this performance designed for? (e.g. "Ex-partners", "Rivals", "High-Value Mates"). Analyze the **Signaling Strategy**: Is it "Broadcasting" for attention or "Narrowcasting" to a specific type? Decode the specific **Mating Call** or **Status Signal** hidden in the content.]
-      
-      3. **Persona & Impression**: 
+
+      3. **Persona & Impression**:
          [Write a deep analysis (150-200 words). Name the Character (e.g., "The Stoic Founder", "The Chill Girl"). Infer the Big Five traits from their posting habits. Analyze the **Shadow Self**: What part of their personality are they *desperately* trying to hide from the world?]
-      
-      4. **Performance & Purpose**: 
+
+      4. **Performance & Purpose**:
          [Write a deep analysis (150-200 words). Analyze the "Return on Investment" for their posts. What specific **Emotional Currency** are they farming? (e.g. Intellect validation, Sexual validation, Pity). Identify the **Core Emotional Void** they are trying to fill through digital approval.]
-      
-      5. **Suggested Replies / Opening Lines**: 
+
+      5. **Suggested Replies / Opening Lines**:
          - 3 distinct, high-EQ DMs to slide into their inbox based on this analysis.
          - (1. Casual/Low pressure, 2. Direct/Confident, 3. Insightful/Deep).
+
+      **OUTPUT FORMAT (JSON ONLY)**:
+      {
+        "platform": "string",
+        "handle": "string",
+        "timeframe": "string",
+        "reportTags": ["string", "string", "string"],
+        "surfaceSubtext": "string (150-200 words analysis from section 1)",
+        "targetAudience": "string (150-200 words analysis from section 2)",
+        "personaImpression": "string (150-200 words analysis from section 3)",
+        "performancePurpose": "string (150-200 words analysis from section 4)",
+        "suggestedReplies": ["string (casual reply)", "string (direct reply)", "string (insightful reply)"]
+      }
     `;
 
   const response = await callAI({
