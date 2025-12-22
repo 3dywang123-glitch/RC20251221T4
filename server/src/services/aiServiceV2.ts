@@ -16,9 +16,10 @@ interface AIResponse {
 
 export const callAI = async (options: AICallOptions): Promise<AIResponse> => {
   const { model, prompt, images = [], responseFormat = 'text', thinkingBudget } = options;
+
   // Use configurable endpoint with fallback
   const endpoint = process.env.AI_API_ENDPOINT || 'https://hnd1.aihub.zeabur.ai/';
-  const apiKey = process.env.GEMINI_API_KEY || 'sk-demo'; // 公开端点可能不需要密钥
+  const apiKey = process.env.GEMINI_API_KEY || 'sk-demo'; 
 
   if (!apiKey) {
     throw new Error("API Key is missing. Please check your configuration.");
@@ -90,8 +91,8 @@ export const parseJSON = (text: string): Record<string, any> => {
   
   // Handle AI Refusals gracefully
   if (text.trim().startsWith("I am unable") || text.includes("unable to fulfill") || text.includes("I cannot")) {
-     console.warn("AI Refusal detected:", text);
-     return {};
+      console.warn("AI Refusal detected:", text);
+      return {};
   }
 
   const attemptParse = (str: string) => {
@@ -203,7 +204,6 @@ export const analyzeProfileOverview = async (
       Analyze the provided social media screenshots (e.g., WeChat Moments, Instagram) and context: ${url}.
       
       **IMPORTANT**: ${langInstruction}
-
       **MISSION**: Decode the "Impression Management" strategy of this profile.
       **TONE**: Surgical, Incisive, Clinical but **Emotionally Deep**.
       
@@ -211,12 +211,11 @@ export const analyzeProfileOverview = async (
       For the first four sections, write a **CONCISE BUT DEEP** analysis (approx 150-200 words per section).
 
       --- ANALYSIS SECTIONS (Map to JSON) ---
-
       1. **Surface vs. Subtext**: [Decode the Visual Semiotics. Describe the aesthetic and what it signals.]
       
       2. **Target Audience**: [Who is this performance designed for? Analyze the Signaling Strategy.]
       
-      3. **Persona & Impression**: [Name the Character. Infer Big Five traits. Analyze the Shadow Self.]
+      3. **Persona & Impression**: [Name the Character. Infer Big Five traits. Analyze the Shadow Self..]
       
       4. **Performance & Purpose**: [Analyze the "Return on Investment". What Emotional Currency are they farming?]
       
@@ -292,16 +291,13 @@ export const analyzePost = async (
 
   const prompt = `
   You are an expert Social Dynamics Analyst & Psychologist.
-
   **IMPORTANT**: ${langInstruction}
 
   **MISSION**: Perform a **Deep, Expansive** analysis of the provided social media post. 
   **CRITICAL**: Do NOT just describe the image. Interpret **WHY** it was posted.
-
   **TONE**: Perceptive, Witty, Insightful, and Empathetic.
 
   **ANALYSIS STRUCTURE (Markdown in JSON)**:
-
   ### ${headers.h1}
   [Analyze the environment, lighting, chaos vs order. Approx 250-300 words.]
 
@@ -382,11 +378,9 @@ export const analyzeChatLog = async (
 
   const prompt = `
   You are an Expert Clinical Relationship Psychologist & Behavioral Profiler.
-
   **IMPORTANT**: ${langInstruction}
 
   **MISSION**: Do not just summarize the conversation. Interpret the subtext. Identify the "Unspoken Contract".
-
   **TONE**: Professional, Objective, Honest, High-Resolution.
 
   --- CASE FILE ---
@@ -428,7 +422,7 @@ export const analyzeChatLog = async (
   });
 
   const data = parseJSON(response.text);
-
+  
   return {
     compatibilityScore: data.compatibilityScore || 0,
     statusAssessment: data.statusAssessment || "Analysis complete.",
@@ -462,7 +456,7 @@ export const analyzePersonalityV2 = async (
 ) => {
   // Context Construction from history
   let deepContext = "";
-
+  
   if (socialAnalysisHistory.length > 0) {
     const latestSocial = socialAnalysisHistory[socialAnalysisHistory.length - 1];
     deepContext += `\n[[INTELLIGENCE SOURCE 1: LATEST SOCIAL PROFILE ANALYSIS]]\nPlatform: ${latestSocial.platform}\nHandle: ${latestSocial.handle}\nCore Impression: ${latestSocial.personaImpression || latestSocial.persona_impression}\nHidden Subtext: ${latestSocial.surfaceSubtext || latestSocial.surface_subtext}\nUnderlying Motivation: ${latestSocial.performancePurpose || latestSocial.performance_purpose}\n`;
@@ -497,7 +491,6 @@ export const analyzePersonalityV2 = async (
 
   const prompt = `
   You are a Master Psychological Profiler (Clinical & Data-Driven). 
-
   **MISSION**: Construct a high-precision, deep-dive personality profile for "${profile.name}".
   
   **IMPORTANT**: ${langInstruction}
@@ -516,9 +509,7 @@ export const analyzePersonalityV2 = async (
   - **CONSISTENCY**: Ensure JSON numerical scores align with narrative analysis.
 
   **REQUIRED OUTPUT STRUCTURE**:
-
   1. **'summary' Field** MUST contain these 3 SPECIFIC HEADERS:
-
      ### ${headers.archetype}
      [Name their psychological archetype. Write a powerful narrative summary.]
 
@@ -603,31 +594,41 @@ export const compressImage = async (base64Str: string, maxWidth = 800, quality =
   return base64Str;
 };
 
-// Persona Reply for Chat Simulation
+// Persona Reply for Chat Simulation (Simulate Chat)
+// ✅ Updated: Adds language support and explicit "Coach Insight" generation
 export const generatePersonaReply = async (
   target: any,
   messages: any[],
+  language: string = 'en',
   model: string = 'gemini-2.0-flash-exp'
 ) => {
-  const prompt = `
-    You are an expert method actor and behavioral psychologist.
-    Roleplay as ${target.name} based on their personality and respond to the last message.
+  const isCn = language === 'cn';
+  const langInstruction = isCn 
+    ? 'Respond in STRICT Simplified Chinese (简体中文). The character reply AND the insight must be in Chinese.' 
+    : 'Respond in English.';
 
-    Target Profile:
-    - Name: ${target.name}
-    - Age: ${target.age}
-    - Occupation: ${target.occupation}
-    - Bio: ${target.bio}
-    ${target.personalityReport ? `- MBTI: ${target.personalityReport.mbti}` : ''}
-    ${target.personalityReport ? `- Communication Style: ${target.personalityReport.communicationStyle}` : ''}
+  const prompt = `
+    You are an AI Simulation Engine playing two roles simultaneously:
+    
+    ROLE 1: The Persona ("${target.name}")
+    - You are ${target.name}, ${target.age} years old, ${target.occupation}.
+    - Personality: ${target.bio} ${target.personalityReport ? `(MBTI: ${target.personalityReport.mbti})` : ''}
+    - You must respond to the user's last message naturally, staying strictly in character.
+
+    ROLE 2: The Dating Coach (The "Insight")
+    - You are an expert Social Dynamics Coach observing this interaction.
+    - You must analyze the User's last message. Was it attractive? Need, insecure? Or confident?
+    - Give brief, tactical advice on what the user did right or wrong.
+
+    **IMPORTANT**: ${langInstruction}
 
     Recent conversation:
     ${messages.slice(-5).map(m => `${m.sender}: ${m.text}`).join('\n')}
 
     OUTPUT FORMAT (JSON):
     {
-      "reply": "The character's text message reply",
-      "insight": "Psychological subtext analysis"
+      "reply": "The character's text message reply (In character)",
+      "insight": "Coach's analysis of the user's move (Tactical advice, NOT just a summary)"
     }
   `;
 
