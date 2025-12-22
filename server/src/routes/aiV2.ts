@@ -24,14 +24,14 @@ router.post('/smart-classify', authenticate, async (req: AuthRequest, res: Respo
 router.post('/analyze-overview', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { url, screenshots, language, model } = req.body;
-    
-    if (!screenshots || !Array.isArray(screenshots) || screenshots.length === 0) {
-      return res.status(400).json({ error: 'Screenshots array is required' });
+
+    if (!url && (!screenshots || !Array.isArray(screenshots) || screenshots.length === 0)) {
+      return res.status(400).json({ error: 'Either URL or screenshots are required' });
     }
 
     const result = await aiServiceV2.analyzeProfileOverview(
-      url || '', 
-      screenshots, 
+      url || '',
+      screenshots || [],
       language || 'en',
       model
     );
@@ -45,14 +45,14 @@ router.post('/analyze-overview', authenticate, async (req: AuthRequest, res: Res
 router.post('/analyze-post', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { content, images, language, model } = req.body;
-    
-    if (!images || !Array.isArray(images) || images.length === 0) {
-      return res.status(400).json({ error: 'Images array is required' });
+
+    if (!content && (!images || !Array.isArray(images) || images.length === 0)) {
+      return res.status(400).json({ error: 'Either content or images are required' });
     }
 
     const result = await aiServiceV2.analyzePost(
-      content || '', 
-      images, 
+      content || '',
+      images || [],
       language || 'en',
       model
     );
@@ -66,9 +66,9 @@ router.post('/analyze-post', authenticate, async (req: AuthRequest, res: Respons
 router.post('/analyze-chat-log', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { target, user, context, language, model } = req.body;
-    
-    if (!context || !context.chatLogs) {
-      return res.status(400).json({ error: 'Chat logs are required' });
+
+    if (!context || (!context.chatLogs && (!context.chatImages || context.chatImages.length === 0))) {
+      return res.status(400).json({ error: 'Either chat logs or chat images are required' });
     }
 
     const result = await aiServiceV2.analyzeChatLog(

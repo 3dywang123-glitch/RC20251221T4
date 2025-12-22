@@ -125,7 +125,7 @@ export const parseJSON = (text: string): Record<string, any> => {
 // ==================== V2 Analysis Services ====================
 
 // Smart Classification & Extraction
-export const classifyAndExtract = async (images: string[], model: string = 'gemini-3-flash-preview') => {
+export const classifyAndExtract = async (images: string[], model: string = 'gemini-2.5-flash-image') => {
   const promptText = `
   You are an expert UI/UX Analyst for Asian Social Apps (WeChat, RedNote, Instagram).
   Analyze the **COLLECTION** of screenshots provided as a single dataset.
