@@ -765,22 +765,30 @@ const ProfilePage: React.FC<Props> = ({
            <div className="flex flex-col gap-3 pb-8">
               {historyItems.map((item: any) => {
                  let typeIcon, typeColor, typeTitle, typeTags: string[] = [];
-                 
+                 let iconClass = '';
+                 let tagClass = '';
+
                  if (item.type === 'social') {
                     typeIcon = <ChartIcon className="w-4 h-4" />;
                     typeColor = "blue";
                     typeTitle = t('reports.types.social');
                     typeTags = item.reportTags || [];
+                    iconClass = 'bg-blue-50 text-blue-600';
+                    tagClass = 'text-blue-600/80 bg-blue-50 border-blue-100';
 } else if (item.type === 'post') {
   typeIcon = <ZapIcon className="w-4 h-4" />;
   typeColor = "gold-dark";
   typeTitle = t('reports.types.post');
   typeTags = item.tags || [];
+  iconClass = 'bg-gold/10 text-gold-dark';
+  tagClass = 'text-gold-dark bg-gold/5 border-gold/10';
                  } else if (item.type === 'consult') {
                     typeIcon = <BrainIcon className="w-4 h-4" />;
                     typeColor = "purple";
                     typeTitle = t('reports.types.chat');
                     typeTags = item.tags || [];
+                    iconClass = 'bg-purple-50 text-purple-600';
+                    tagClass = 'text-purple-600/80 bg-purple-50 border-purple-100';
                  }
 
                  const dateObj = new Date(item.date);
@@ -801,7 +809,7 @@ const ProfilePage: React.FC<Props> = ({
                         {/* Row 1: Icon + Title + Date/Time */}
                         <div className="flex items-center justify-between w-full">
                             <div className="flex items-center gap-2 min-w-0">
-                                <div className={`w-6 h-6 rounded-full bg-${typeColor}-50 text-${typeColor}-600 flex items-center justify-center flex-shrink-0 shadow-sm`}>
+                                <div className={`w-6 h-6 rounded-full ${iconClass} flex items-center justify-center flex-shrink-0 shadow-sm`}>
                                     {/* Fix: Explicit type cast for React.cloneElement to include className */}
                                     {React.cloneElement(typeIcon as React.ReactElement<{ className?: string }>, { className: 'w-3.5 h-3.5' })}
                                 </div>
@@ -812,13 +820,13 @@ const ProfilePage: React.FC<Props> = ({
                                 <span className="text-[9px] text-navy/20 tabular-nums font-medium">{timeStr}</span>
                             </div>
                         </div>
-                        
+
                         {/* Row 2: Strictly Single Line Tags - Max 3 */}
                         <div className="flex flex-row items-center gap-1.5 w-full overflow-hidden whitespace-nowrap">
                            {typeTags.slice(0, 3).map((tag, idx) => (
                               <span
                                 key={idx}
-                                className={`text-[9px] font-bold text-${typeColor} bg-${typeColor}-50 px-1.5 py-0.5 rounded border border-${typeColor}-100 truncate`}
+                                className={`text-[9px] font-bold ${tagClass} px-1.5 py-0.5 rounded truncate`}
                                 style={{ flexShrink: idx === 2 ? 1 : 0, minWidth: 0 }}
                               >
                                  {tag.replace(/^#/, '')}
