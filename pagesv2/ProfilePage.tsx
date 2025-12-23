@@ -816,9 +816,9 @@ const ProfilePage: React.FC<Props> = ({
                         {/* Row 2: Strictly Single Line Tags - Max 3 */}
                         <div className="flex flex-row items-center gap-1.5 w-full overflow-hidden whitespace-nowrap">
                            {typeTags.slice(0, 3).map((tag, idx) => (
-                              <span 
-                                key={idx} 
-                                className={`text-[9px] font-bold text-${typeColor}-600/80 bg-${typeColor}-50 px-1.5 py-0.5 rounded border border-${typeColor}-100 truncate`}
+                              <span
+                                key={idx}
+                                className={`text-[9px] font-bold text-${typeColor} bg-${typeColor}-50 px-1.5 py-0.5 rounded border border-${typeColor}-100 truncate`}
                                 style={{ flexShrink: idx === 2 ? 1 : 0, minWidth: 0 }}
                               >
                                  {tag.replace(/^#/, '')}
