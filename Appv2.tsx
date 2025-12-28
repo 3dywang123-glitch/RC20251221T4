@@ -22,6 +22,7 @@ import WelcomeModal from './componentsv2/WelcomeModal';
 
 import * as Storage from './servicesv2/storageService';
 import * as AuthService from './servicesv2/authService';
+import { userAPI, setAuthToken } from './servicesv2/apiClient';
 import * as Gemini from './servicesv2/geminiService';
 import { User, TargetProfile, ChatSession, SocialPostAnalysis, RelationshipReport, SocialAnalysisResult, UserProfile, ChatMessage } from './types';
 import { LanguageProvider, useTranslation } from './contextsv2/LanguageContext';
@@ -84,26 +85,57 @@ function AppContent() {
   };
 
   // Init
-  useEffect(() => {
+useEffect(() => {
+  const initSession = async () => {
     const session = AuthService.getSession();
-    if (session) {
-      setUser(session);
-      Storage.setContext(session.id);
-      setTargets(Storage.getTargets());
-      setView('directory');
+    const token = localStorage.getItem('soulsync_auth_token');
 
-      // Restore auth token for API calls
-      const token = localStorage.getItem('soulsync_auth_token') || localStorage.getItem('token');
-      if (token) {
-        import('./servicesv2/apiClient').then(({ setAuthToken }) => {
-          setAuthToken(token);
-        });
+    if (session && token) {
+      // 1. 先设置 Token，确保后续 API 调用携带凭证
+      setAuthToken(token);
+
+      try {
+        // 2. 关键步骤：尝试请求用户资料来验证 Token 有效性
+        await userAPI.getProfile();
+
+        // A. 验证成功：恢复正常状态
+        setUser(session);
+        Storage.setContext(session.id);
+        setTargets(Storage.getTargets());
+        setView('directory');
+      } catch (error) {
+        console.warn("Token invalid or expired, attempting recovery...", error);
+
+        // B. 验证失败 (401 等)：尝试自动修复
+        if (session.isGuest) {
+          try {
+            // B1. 如果是游客，自动在后台重新登录获取新身份 (无感)
+            const newGuest = await AuthService.loginAsGuest();
+
+            // 更新全局状态
+            setUser(newGuest);
+            Storage.setContext(newGuest.id);
+            setTargets(Storage.getTargets()); // 注意：新游客ID可能是空的列表
+            setView('directory');
+            console.log("Guest session seamlessly recovered.");
+          } catch (guestErr) {
+            // B2. 自动修复失败，只能退回登录页
+            console.error("Guest auto-login failed", guestErr);
+            handleLogout();
+          }
+        } else {
+          // C. 如果是注册用户，必须重新登录
+          handleLogout();
+        }
       }
     } else {
       setView('auth');
     }
     setShowWelcome(true);
-  }, []);
+  };
+
+  initSession();
+}, []);
 
   useEffect(() => {
     if (activeTargetId) {

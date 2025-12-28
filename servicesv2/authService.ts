@@ -24,11 +24,20 @@ const saveDB = (users: DBUser[]) => {
 };
 
 // --- Service Methods ---
-
 export const loginAsGuest = async (): Promise<User> => {
   try {
-    // Call server API
     const result = await authAPI.guestLogin();
+    setAuthToken(result.token); // 关键：必须有 Token
+    // ... 保存 session ...
+    return user;
+  } catch (error: any) {
+    // 🔴 建议删除或修改此处的本地 fallback
+    // 如果没有 Token，后续的 AI 请求 100% 会失败。
+    // 这种“假登录”没有任何意义，只会让用户困惑。
+    console.error('Server guest login failed:', error);
+    throw error; // 直接抛出错误，让 UI 层提示“网络连接失败”
+  }
+};
     
     // Store token
     setAuthToken(result.token);
