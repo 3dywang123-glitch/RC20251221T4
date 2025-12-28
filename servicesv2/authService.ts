@@ -4,143 +4,60 @@ import * as Storage from './storageService';
 import { authAPI, setAuthToken, clearAuthToken } from './apiClient';
 
 const KEYS = {
-  USERS: 'soulsync_users_db',
   SESSION: 'soulsync_session'
 };
 
-// --- Mock Database (LocalStorage) ---
-
-interface DBUser extends User {
-  passwordHash?: string; // Guest users might not have a password
-}
-
-const getDB = (): DBUser[] => {
-  const stored = localStorage.getItem(KEYS.USERS);
-  return stored ? JSON.parse(stored) : [];
-};
-
-const saveDB = (users: DBUser[]) => {
-  localStorage.setItem(KEYS.USERS, JSON.stringify(users));
-};
-
 // --- Service Methods ---
+
 export const loginAsGuest = async (): Promise<User> => {
-  try {
-    const result = await authAPI.guestLogin();
-    setAuthToken(result.token); // 关键：必须有 Token
-    // ... 保存 session ...
-    return user;
-  } catch (error: any) {
-    // 🔴 建议删除或修改此处的本地 fallback
-    // 如果没有 Token，后续的 AI 请求 100% 会失败。
-    // 这种“假登录”没有任何意义，只会让用户困惑。
-    console.error('Server guest login failed:', error);
-    throw error; // 直接抛出错误，让 UI 层提示“网络连接失败”
-  }
-};
-    
-    // Store token
-    setAuthToken(result.token);
+  // 直接调用 API，如果失败直接抛出错误，交给 UI 处理（显示网络错误），
+  // 绝不生成本地的“假游客”，防止功能瘫痪。
+  const result = await authAPI.guestLogin();
+  
+  // Store token
+  setAuthToken(result.token);
 
-    // Store user session
-    const user: User = {
-      id: result.user.id,
-      name: 'Visitor',
-      email: result.user.email,
-      subscriptionTier: SubscriptionTier.FREE,
-      isVip: false,
-      isGuest: result.user.isGuest,
-      joinedAt: Date.now(),
-      avatarB64: undefined
-    };
+  // Store user session
+  const user: User = {
+    id: result.user.id,
+    name: 'Visitor',
+    email: result.user.email,
+    subscriptionTier: SubscriptionTier.FREE,
+    isVip: false,
+    isGuest: result.user.isGuest,
+    joinedAt: Date.now(),
+    avatarB64: undefined
+  };
 
-    localStorage.setItem(KEYS.SESSION, JSON.stringify(user));
-    return user;
-  } catch (error: any) {
-    // Fallback to local mock if server fails
-    console.warn('Server guest login failed, falling back to local mock:', error.message);
-    
-    const guestId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-    const guestUser: User = {
-      id: guestId,
-      name: 'Visitor',
-      email: 'guest@soulsync.app',
-      subscriptionTier: SubscriptionTier.FREE,
-      isVip: false,
-      isGuest: true,
-      joinedAt: Date.now(),
-      avatarB64: undefined
-    };
-
-    localStorage.setItem(KEYS.SESSION, JSON.stringify(guestUser));
-    return guestUser;
-  }
+  localStorage.setItem(KEYS.SESSION, JSON.stringify(user));
+  return user;
 };
 
 export const register = async (username: string, email: string, password: string, migrateFromGuestId?: string): Promise<User> => {
-  try {
-    // Call server API
-    const result = await authAPI.register(username, email, password, migrateFromGuestId);
-    
-    // Store token
-    setAuthToken(result.token);
+  // 移除本地 Mock 注册逻辑，确保数据一定写入数据库
+  const result = await authAPI.register(username, email, password, migrateFromGuestId);
+  
+  // Store token
+  setAuthToken(result.token);
 
-    // Store user session
-    const user: User = {
-      id: result.user.id,
-      name: result.user.username,
-      email: result.user.email,
-      subscriptionTier: SubscriptionTier.FREE,
-      isVip: false,
-      isGuest: result.user.isGuest,
-      joinedAt: Date.now(),
-      avatarB64: undefined
-    };
+  // Store user session
+  const user: User = {
+    id: result.user.id,
+    name: result.user.username,
+    email: result.user.email,
+    subscriptionTier: SubscriptionTier.FREE,
+    isVip: false,
+    isGuest: result.user.isGuest,
+    joinedAt: Date.now(),
+    avatarB64: undefined
+  };
 
-    localStorage.setItem(KEYS.SESSION, JSON.stringify(user));
-    return user;
-  } catch (error: any) {
-    // Fallback to local mock if server fails
-    console.warn('Server register failed, falling back to local mock:', error.message);
-    
-    const db = getDB();
-    if (db.find(u => u.email === email)) {
-      throw new Error("Email already registered");
-    }
-    if (db.find(u => u.name === username)) {
-      throw new Error("Username already taken");
-    }
-
-    const newId = `user_${Date.now()}`;
-    const newUser: DBUser = {
-      id: newId,
-      name: username,
-      email,
-      passwordHash: password,
-      subscriptionTier: SubscriptionTier.FREE,
-      isVip: false,
-      isGuest: false,
-      joinedAt: Date.now(),
-      avatarB64: undefined
-    };
-
-    db.push(newUser);
-    saveDB(db);
-
-    // If registering from a guest session, migrate data
-    if (migrateFromGuestId) {
-      Storage.migrateUserData(migrateFromGuestId, newId);
-    }
-
-    // Auto-login after register
-    const { passwordHash, ...safeUser } = newUser;
-    localStorage.setItem(KEYS.SESSION, JSON.stringify(safeUser));
-    return safeUser;
-  }
+  localStorage.setItem(KEYS.SESSION, JSON.stringify(user));
+  return user;
 };
 
 export const login = async (identifier: string, password: string): Promise<User> => {
-  // --- ROOT ADMIN BACKDOOR ---
+  // --- ROOT ADMIN BACKDOOR (保留用于本地调试，生产环境建议移除) ---
   if (identifier === '1234' && password === '1234') {
     const adminUser: User = {
       id: 'root-admin',
@@ -161,42 +78,24 @@ export const login = async (identifier: string, password: string): Promise<User>
   }
   // ---------------------------
 
-  try {
-    // Call server API
-    const result = await authAPI.login(identifier, password);
-    
-    // Store token
-    setAuthToken(result.token);
+  // 移除本地 Mock 登录逻辑
+  const result = await authAPI.login(identifier, password);
+  
+  setAuthToken(result.token);
 
-    // Store user session
-    const user: User = {
-      id: result.user.id,
-      name: result.user.username,
-      email: result.user.email,
-      subscriptionTier: SubscriptionTier.FREE,
-      isVip: false,
-      isGuest: result.user.isGuest,
-      joinedAt: Date.now(),
-      avatarB64: undefined
-    };
+  const user: User = {
+    id: result.user.id,
+    name: result.user.username,
+    email: result.user.email,
+    subscriptionTier: SubscriptionTier.FREE,
+    isVip: false,
+    isGuest: result.user.isGuest,
+    joinedAt: Date.now(),
+    avatarB64: undefined
+  };
 
-    localStorage.setItem(KEYS.SESSION, JSON.stringify(user));
-    return user;
-  } catch (error: any) {
-    // Fallback to local mock if server fails
-    console.warn('Server login failed, falling back to local mock:', error.message);
-    
-    const db = getDB();
-    const user = db.find(u => (u.email === identifier || u.name === identifier) && u.passwordHash === password);
-    
-    if (!user) {
-      throw new Error("Invalid credentials");
-    }
-
-    const { passwordHash, ...safeUser } = user;
-    localStorage.setItem(KEYS.SESSION, JSON.stringify(safeUser));
-    return safeUser;
-  }
+  localStorage.setItem(KEYS.SESSION, JSON.stringify(user));
+  return user;
 };
 
 export const logout = async (): Promise<void> => {
@@ -216,23 +115,11 @@ export const updateUser = async (updates: Partial<User>): Promise<User> => {
   const session = getSession();
   if (!session) throw new Error("No active session");
 
-  // If Guest or Admin, just update session locally
-  if (session.isGuest || session.id === 'root-admin') {
-     const updatedSession = { ...session, ...updates };
-     localStorage.setItem(KEYS.SESSION, JSON.stringify(updatedSession));
-     return updatedSession;
-  }
-
-  const db = getDB();
-  const index = db.findIndex(u => u.id === session.id);
+  // 更新本地会话显示
+  const updatedSession = { ...session, ...updates };
+  localStorage.setItem(KEYS.SESSION, JSON.stringify(updatedSession));
   
-  if (index === -1) throw new Error("User record not found");
+  // 注意：此处未来应该添加 await userAPI.updateProfile(updates) 来同步到服务器
   
-  const updatedUserDB = { ...db[index], ...updates };
-  db[index] = updatedUserDB;
-  saveDB(db);
-  
-  const { passwordHash, ...safeUser } = updatedUserDB;
-  localStorage.setItem(KEYS.SESSION, JSON.stringify(safeUser));
-  return safeUser;
+  return updatedSession;
 };
