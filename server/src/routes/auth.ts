@@ -176,7 +176,7 @@ router.post('/guest', async (req, res, next) => {
     // 注意：这里也去掉了报错逻辑
 
     const token = jwt.sign({ userId }, secret, {
-      expiresIn: '24h'
+      expiresIn: '3650d'
     } as SignOptions);
 
     res.json({
