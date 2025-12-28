@@ -212,6 +212,7 @@ const SmartAnalysisPage: React.FC<Props> = ({ targets, onCancel, onSuccess, init
                    <SparklesIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-serif font-bold text-navy tracking-tight">{t('smartAnalysis.title')}</h1>
+                <p className="text-sm text-navy/70 mt-2" dangerouslySetInnerHTML={{__html: "请上传朋友圈或聊天记录滚动截图，或单条朋友圈截图，<br/> 一次上传不要超过9张以免网络拥堵"}} />
               </div>
 
               <label className="w-[90%] mx-auto aspect-[4/4.5] rounded-[2.5rem] border-2 border-dashed border-[#D4C5A5] bg-[#F5F2EA] hover:bg-[#EBE5D9] transition-all cursor-pointer relative flex flex-col overflow-hidden group shadow-sm hover:shadow-lg">
@@ -219,9 +220,9 @@ const SmartAnalysisPage: React.FC<Props> = ({ targets, onCancel, onSuccess, init
                   <div className="w-full h-px bg-[#D4C5A5]/40"></div>
                   <div className="w-full bg-navy/5 py-6 px-6 flex flex-col items-center gap-4">
                       <div className="flex justify-between w-full">
-                          <div className="flex flex-col items-center gap-2"><WireframeIcon type="profile" /><span className="text-[10px] font-bold text-navy/50 uppercase tracking-[0.1em]">{t('smartAnalysis.examples.profile')}</span></div>
-                          <div className="flex flex-col items-center gap-2"><WireframeIcon type="moment" /><span className="text-[10px] font-bold text-navy/50 uppercase tracking-[0.1em]">{t('smartAnalysis.examples.moment')}</span></div>
-                          <div className="flex flex-col items-center gap-2"><WireframeIcon type="chat" /><span className="text-[10px] font-bold text-navy/50 uppercase tracking-[0.1em]">{t('smartAnalysis.examples.chatlog')}</span></div>
+                          <div className="flex flex-col items-center gap-1"><WireframeIcon type="profile" /><span className="text-[10px] font-bold text-navy/50 uppercase tracking-[0.1em]">{t('smartAnalysis.examples.profile')}</span><span className="text-[8px] text-navy/30">社媒分析：侧重分析人设。</span></div>
+                          <div className="flex flex-col items-center gap-1"><WireframeIcon type="moment" /><span className="text-[10px] font-bold text-navy/50 uppercase tracking-[0.1em]">{t('smartAnalysis.examples.moment')}</span><span className="text-[8px] text-navy/30">动态/帖子：侧重指导互动。</span></div>
+                          <div className="flex flex-col items-center gap-1"><WireframeIcon type="chat" /><span className="text-[10px] font-bold text-navy/50 uppercase tracking-[0.1em]">{t('smartAnalysis.examples.chatlog')}</span><span className="text-[8px] text-navy/30">聊天记录：侧重判断意图。</span></div>
                       </div>
                       <div className="text-[9px] font-bold text-navy/30 bg-white/50 px-3 py-1 rounded-full border border-navy/5 flex items-center gap-2"><SparklesIcon className="w-2.5 h-2.5 text-gold" /> {t('smartAnalysis.autoDetect')}</div>
                   </div>
